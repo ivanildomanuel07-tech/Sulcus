@@ -1,0 +1,1615 @@
+<!DOCTYPE html>
+<html lang="pt">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>SULCUS — Aprendizagem que Deixa Marca</title>
+<link href="https://fonts.googleapis.com/css2?family=Bebas+Neue&family=Instrument+Serif:ital@0;1&family=IBM+Plex+Mono:wght@400;500&family=DM+Sans:opsz,wght@9..40,300;9..40,400;9..40,500&display=swap" rel="stylesheet">
+<style>
+:root {
+  --bg: #F5F0E8;
+  --surface: #FFFFFF;
+  --surface2: #EDE8DC;
+  --surface3: #E4DDD0;
+  --border: #C4B99A;
+  --border2: #A89880;
+  --text: #1A1208;
+  --muted: #6B5B3E;
+  --hint: #A89880;
+  --accent: #C4460A;
+  --accent2: #E05A1A;
+  --teal: #2A7A55;
+  --teal-bg: #E8F5EE;
+  --amber: #8A6000;
+  --amber-bg: #FDF3DC;
+}
+
+*, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+html { scroll-behavior: smooth; }
+
+body {
+  font-family: 'DM Sans', sans-serif;
+  background: var(--bg);
+  color: var(--text);
+  font-size: 15px;
+  line-height: 1.6;
+  overflow-x: hidden;
+}
+
+::-webkit-scrollbar { width: 3px; }
+::-webkit-scrollbar-thumb { background: var(--border); }
+
+/* ══ NOISE TEXTURE OVERLAY ══ */
+body::before {
+  content: '';
+  position: fixed;
+  inset: 0;
+  background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 256 256' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='noise'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23noise)' opacity='0.04'/%3E%3C/svg%3E");
+  pointer-events: none;
+  z-index: 1000;
+  opacity: 0.4;
+}
+
+/* ══ NAV ══ */
+nav {
+  position: fixed;
+  top: 0; left: 0; right: 0;
+  z-index: 100;
+  height: 56px;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 0 40px;
+  background: rgba(245,240,232,0.92);
+  backdrop-filter: blur(12px);
+  -webkit-backdrop-filter: blur(12px);
+  border-bottom: 1px solid transparent;
+  transition: border-color .3s;
+}
+nav.scrolled { border-bottom-color: var(--border); }
+.nav-logo {
+  font-family: 'Bebas Neue', sans-serif;
+  font-size: 24px;
+  letter-spacing: 0.06em;
+  color: var(--text);
+  text-decoration: none;
+}
+.nav-logo span { color: var(--accent); }
+.nav-links {
+  display: flex;
+  align-items: center;
+  gap: 32px;
+  list-style: none;
+}
+.nav-links a {
+  font-family: 'IBM Plex Mono', monospace;
+  font-size: 10px;
+  letter-spacing: 0.1em;
+  text-transform: uppercase;
+  color: var(--muted);
+  text-decoration: none;
+  transition: color .15s;
+}
+.nav-links a:hover { color: var(--text); }
+.nav-cta {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}
+.btn-nav-ghost {
+  font-family: 'IBM Plex Mono', monospace;
+  font-size: 10px;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  color: var(--muted);
+  background: none;
+  border: 1px solid var(--border);
+  padding: 8px 18px;
+  cursor: pointer;
+  text-decoration: none;
+  transition: all .15s;
+  display: inline-block;
+}
+.btn-nav-ghost:hover { border-color: var(--border2); color: var(--text); }
+.btn-nav-primary {
+  font-family: 'IBM Plex Mono', monospace;
+  font-size: 10px;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  color: var(--bg);
+  background: var(--text);
+  border: 1px solid var(--text);
+  padding: 8px 18px;
+  cursor: pointer;
+  text-decoration: none;
+  transition: all .15s;
+  display: inline-block;
+}
+.btn-nav-primary:hover { background: var(--accent); border-color: var(--accent); }
+.hamburger { display: none; background: none; border: none; cursor: pointer; color: var(--text); padding: 4px; }
+
+/* ══ HERO ══ */
+.hero {
+  min-height: 100dvh;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  position: relative;
+  overflow: hidden;
+  padding: 80px 40px 60px;
+  text-align: center;
+}
+
+/* Background grid */
+.hero-grid {
+  position: absolute;
+  inset: 0;
+  background-image:
+    repeating-linear-gradient(0deg, transparent, transparent 59px, rgba(26,18,8,0.035) 59px, rgba(26,18,8,0.035) 60px),
+    repeating-linear-gradient(90deg, transparent, transparent 59px, rgba(26,18,8,0.035) 59px, rgba(26,18,8,0.035) 60px);
+  pointer-events: none;
+}
+
+/* Decorative rings */
+.hero-ring {
+  position: absolute;
+  border-radius: 50%;
+  border: 1px solid var(--border);
+  pointer-events: none;
+  top: 50%; left: 50%;
+  transform: translate(-50%, -50%);
+}
+.hero-ring-1 { width: 340px; height: 340px; opacity: 0.15; animation: ringPulse 8s ease-in-out infinite; }
+.hero-ring-2 { width: 560px; height: 560px; opacity: 0.08; border-style: dashed; animation: ringPulse 12s ease-in-out infinite reverse; }
+.hero-ring-3 { width: 780px; height: 780px; opacity: 0.05; animation: ringPulse 16s ease-in-out infinite; }
+
+@keyframes ringPulse {
+  0%, 100% { transform: translate(-50%, -50%) scale(1); opacity: var(--op, 0.1); }
+  50% { transform: translate(-50%, -50%) scale(1.04); }
+}
+
+/* Corner marks */
+.hero-corner {
+  position: absolute;
+  width: 18px; height: 18px;
+  pointer-events: none;
+  opacity: 0.25;
+}
+.hero-corner::before, .hero-corner::after {
+  content: '';
+  position: absolute;
+  background: var(--text);
+}
+.hero-corner::before { width: 100%; height: 1px; top: 0; left: 0; }
+.hero-corner::after { width: 1px; height: 100%; top: 0; left: 0; }
+.hero-corner.tl { top: 32px; left: 32px; }
+.hero-corner.tr { top: 32px; right: 32px; transform: scaleX(-1); }
+.hero-corner.bl { bottom: 32px; left: 32px; transform: scaleY(-1); }
+.hero-corner.br { bottom: 32px; right: 32px; transform: scale(-1); }
+
+/* Hero eyebrow */
+.hero-eyebrow {
+  font-family: 'IBM Plex Mono', monospace;
+  font-size: 10px;
+  letter-spacing: 0.18em;
+  text-transform: uppercase;
+  color: var(--accent);
+  margin-bottom: 24px;
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  opacity: 0;
+  animation: fadeUp .6s .1s ease forwards;
+}
+.hero-eyebrow::before, .hero-eyebrow::after {
+  content: '';
+  height: 1px;
+  width: 32px;
+  background: var(--accent);
+  opacity: 0.5;
+}
+
+/* SULCUS big */
+.hero-wordmark {
+  position: relative;
+  display: inline-block;
+  opacity: 0;
+  animation: heroWordmark .9s .25s cubic-bezier(0.16,1,0.3,1) forwards;
+}
+@keyframes heroWordmark {
+  from { opacity: 0; transform: perspective(700px) rotateX(12deg) translateY(30px); }
+  to   { opacity: 1; transform: perspective(700px) rotateX(0deg) translateY(0); }
+}
+.hero-title {
+  font-family: 'Bebas Neue', sans-serif;
+  font-size: clamp(100px, 18vw, 220px);
+  letter-spacing: 0.04em;
+  line-height: 0.88;
+  color: var(--text);
+  display: block;
+  text-shadow:
+    3px 3px 0 rgba(196,70,10,0.07),
+    6px 6px 0 rgba(26,18,8,0.04);
+}
+.hero-title .c { color: var(--accent); }
+.hero-underline {
+  height: 2px;
+  background: linear-gradient(90deg, transparent, var(--accent) 30%, var(--accent) 70%, transparent);
+  margin-top: 8px;
+  animation: underlineGrow 1s .8s ease forwards;
+  transform-origin: center;
+  transform: scaleX(0);
+}
+@keyframes underlineGrow { to { transform: scaleX(1); } }
+
+/* Tagline */
+.hero-tagline {
+  font-family: 'Instrument Serif', serif;
+  font-style: italic;
+  font-size: clamp(17px, 2.2vw, 24px);
+  color: var(--muted);
+  margin-top: 28px;
+  max-width: 520px;
+  line-height: 1.55;
+  opacity: 0;
+  animation: fadeUp .6s .55s ease forwards;
+}
+.hero-tagline strong { color: var(--text); font-style: normal; }
+
+/* Hero actions */
+.hero-actions {
+  display: flex;
+  gap: 12px;
+  margin-top: 40px;
+  flex-wrap: wrap;
+  justify-content: center;
+  opacity: 0;
+  animation: fadeUp .6s .7s ease forwards;
+}
+.btn-primary-lg {
+  font-family: 'IBM Plex Mono', monospace;
+  font-size: 11px;
+  letter-spacing: 0.1em;
+  text-transform: uppercase;
+  color: var(--bg);
+  background: var(--text);
+  border: none;
+  padding: 14px 32px;
+  cursor: pointer;
+  text-decoration: none;
+  display: inline-flex;
+  align-items: center;
+  gap: 10px;
+  transition: all .2s;
+}
+.btn-primary-lg:hover { background: var(--accent); }
+.btn-ghost-lg {
+  font-family: 'IBM Plex Mono', monospace;
+  font-size: 11px;
+  letter-spacing: 0.1em;
+  text-transform: uppercase;
+  color: var(--muted);
+  background: transparent;
+  border: 1px solid var(--border);
+  padding: 14px 32px;
+  cursor: pointer;
+  text-decoration: none;
+  display: inline-flex;
+  align-items: center;
+  gap: 10px;
+  transition: all .2s;
+}
+.btn-ghost-lg:hover { border-color: var(--accent); color: var(--accent); }
+
+/* Hero stat strip */
+.hero-stats {
+  display: flex;
+  align-items: center;
+  gap: 0;
+  margin-top: 56px;
+  border: 1px solid var(--border);
+  background: var(--surface);
+  opacity: 0;
+  animation: fadeUp .6s .85s ease forwards;
+}
+.hero-stat {
+  padding: 16px 32px;
+  border-right: 1px solid var(--border);
+  text-align: center;
+}
+.hero-stat:last-child { border-right: none; }
+.hero-stat-val {
+  font-family: 'Bebas Neue', sans-serif;
+  font-size: 28px;
+  letter-spacing: 0.04em;
+  color: var(--text);
+  display: block;
+}
+.hero-stat-val span { color: var(--accent); }
+.hero-stat-lbl {
+  font-family: 'IBM Plex Mono', monospace;
+  font-size: 9px;
+  letter-spacing: 0.1em;
+  text-transform: uppercase;
+  color: var(--hint);
+  display: block;
+  margin-top: 2px;
+}
+
+/* Scroll cue */
+.scroll-cue {
+  position: absolute;
+  bottom: 28px;
+  left: 50%;
+  transform: translateX(-50%);
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 6px;
+  opacity: 0;
+  animation: fadeUp .5s 1.2s ease forwards;
+}
+.scroll-cue span {
+  font-family: 'IBM Plex Mono', monospace;
+  font-size: 9px;
+  letter-spacing: 0.12em;
+  text-transform: uppercase;
+  color: var(--hint);
+}
+.scroll-line {
+  width: 1px;
+  height: 36px;
+  background: linear-gradient(to bottom, var(--border), transparent);
+  animation: scrollLine 2s ease-in-out infinite;
+}
+@keyframes scrollLine {
+  0% { transform: scaleY(0); transform-origin: top; }
+  50% { transform: scaleY(1); transform-origin: top; }
+  51% { transform: scaleY(1); transform-origin: bottom; }
+  100% { transform: scaleY(0); transform-origin: bottom; }
+}
+
+@keyframes fadeUp {
+  from { opacity: 0; transform: translateY(16px); }
+  to   { opacity: 1; transform: translateY(0); }
+}
+
+/* ══ SECTION COMMON ══ */
+section { position: relative; }
+.section-label {
+  font-family: 'IBM Plex Mono', monospace;
+  font-size: 9px;
+  letter-spacing: 0.16em;
+  text-transform: uppercase;
+  color: var(--accent);
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  margin-bottom: 16px;
+}
+.section-label::after {
+  content: '';
+  flex: 1;
+  height: 1px;
+  background: var(--border);
+  max-width: 60px;
+}
+.section-title {
+  font-family: 'Bebas Neue', sans-serif;
+  font-size: clamp(38px, 6vw, 72px);
+  letter-spacing: 0.03em;
+  line-height: 0.92;
+  color: var(--text);
+  margin-bottom: 16px;
+}
+.section-sub {
+  font-family: 'Instrument Serif', serif;
+  font-style: italic;
+  font-size: clamp(15px, 1.8vw, 18px);
+  color: var(--muted);
+  line-height: 1.6;
+  max-width: 480px;
+}
+
+/* ══ WHAT IS SULCUS ══ */
+.about {
+  padding: 120px 40px;
+  background: var(--text);
+  color: var(--bg);
+  overflow: hidden;
+}
+.about-inner {
+  max-width: 1100px;
+  margin: 0 auto;
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 80px;
+  align-items: center;
+}
+.about .section-label { color: var(--accent2); }
+.about .section-label::after { background: rgba(255,255,255,0.12); }
+.about .section-title { color: var(--bg); }
+.about .section-sub { color: rgba(245,240,232,0.65); max-width: 100%; }
+.about-text {
+  font-size: 14px;
+  color: rgba(245,240,232,0.55);
+  line-height: 1.8;
+  margin-top: 20px;
+}
+.about-text p { margin-bottom: 14px; }
+.about-text strong { color: var(--bg); }
+
+/* Sulcus definition card */
+.about-definition {
+  position: relative;
+  border: 1px solid rgba(245,240,232,0.12);
+  padding: 40px;
+  background: rgba(245,240,232,0.04);
+}
+.about-definition::before {
+  content: '"';
+  position: absolute;
+  top: -20px;
+  left: 32px;
+  font-family: 'Instrument Serif', serif;
+  font-size: 80px;
+  color: var(--accent);
+  line-height: 1;
+  opacity: 0.6;
+}
+.def-word {
+  font-family: 'Bebas Neue', sans-serif;
+  font-size: 48px;
+  letter-spacing: 0.06em;
+  color: var(--bg);
+  margin-bottom: 4px;
+}
+.def-word span { color: var(--accent); }
+.def-phonetic {
+  font-family: 'IBM Plex Mono', monospace;
+  font-size: 11px;
+  color: rgba(245,240,232,0.4);
+  margin-bottom: 20px;
+  letter-spacing: 0.04em;
+}
+.def-type {
+  font-family: 'IBM Plex Mono', monospace;
+  font-size: 9px;
+  text-transform: uppercase;
+  letter-spacing: 0.12em;
+  color: var(--accent2);
+  margin-bottom: 10px;
+}
+.def-meaning {
+  font-family: 'Instrument Serif', serif;
+  font-style: italic;
+  font-size: 16px;
+  color: rgba(245,240,232,0.75);
+  line-height: 1.6;
+  border-left: 2px solid var(--accent);
+  padding-left: 16px;
+  margin-bottom: 16px;
+}
+.def-anatomy {
+  font-size: 12px;
+  color: rgba(245,240,232,0.4);
+  font-family: 'IBM Plex Mono', monospace;
+  line-height: 1.6;
+}
+
+/* ══ FEATURES ══ */
+.features {
+  padding: 120px 40px;
+  background: var(--bg);
+}
+.features-inner {
+  max-width: 1100px;
+  margin: 0 auto;
+}
+.features-header {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 40px;
+  align-items: end;
+  margin-bottom: 60px;
+}
+.features-grid {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 1px;
+  background: var(--border);
+  border: 1px solid var(--border);
+}
+.feature-card {
+  background: var(--bg);
+  padding: 36px 28px;
+  position: relative;
+  transition: background .2s;
+  cursor: default;
+}
+.feature-card:hover { background: var(--surface); }
+.feature-card::after {
+  content: '';
+  position: absolute;
+  bottom: 0; left: 0;
+  width: 0; height: 2px;
+  background: var(--accent);
+  transition: width .3s ease;
+}
+.feature-card:hover::after { width: 100%; }
+.feature-icon {
+  width: 40px; height: 40px;
+  border: 1px solid var(--border);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  margin-bottom: 20px;
+  background: var(--surface2);
+}
+.feature-num {
+  font-family: 'IBM Plex Mono', monospace;
+  font-size: 9px;
+  color: var(--hint);
+  letter-spacing: 0.1em;
+  margin-bottom: 10px;
+  text-transform: uppercase;
+}
+.feature-name {
+  font-family: 'Bebas Neue', sans-serif;
+  font-size: 22px;
+  letter-spacing: 0.04em;
+  color: var(--text);
+  margin-bottom: 10px;
+}
+.feature-desc {
+  font-size: 13px;
+  color: var(--muted);
+  line-height: 1.7;
+  font-family: 'Instrument Serif', serif;
+  font-style: italic;
+}
+.feature-tag {
+  display: inline-block;
+  margin-top: 16px;
+  font-family: 'IBM Plex Mono', monospace;
+  font-size: 9px;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  padding: 3px 8px;
+  border: 1px solid;
+}
+.feature-tag.teal { color: var(--teal); border-color: rgba(42,122,85,0.3); background: var(--teal-bg); }
+.feature-tag.amber { color: var(--amber); border-color: rgba(138,96,0,0.3); background: var(--amber-bg); }
+.feature-tag.accent { color: var(--accent); border-color: rgba(196,70,10,0.25); background: rgba(196,70,10,0.06); }
+
+/* ══ HOW IT WORKS ══ */
+.how {
+  padding: 120px 40px;
+  background: var(--surface2);
+  overflow: hidden;
+}
+.how-inner {
+  max-width: 1100px;
+  margin: 0 auto;
+}
+.how-header { margin-bottom: 64px; }
+.steps {
+  display: grid;
+  grid-template-columns: repeat(4, 1fr);
+  gap: 0;
+  position: relative;
+}
+.steps::before {
+  content: '';
+  position: absolute;
+  top: 28px;
+  left: calc(12.5%);
+  right: calc(12.5%);
+  height: 1px;
+  background: var(--border);
+  z-index: 0;
+}
+.step {
+  padding: 0 20px;
+  position: relative;
+  z-index: 1;
+}
+.step-num {
+  width: 56px; height: 56px;
+  border: 1px solid var(--border);
+  background: var(--bg);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-family: 'Bebas Neue', sans-serif;
+  font-size: 22px;
+  letter-spacing: 0.04em;
+  color: var(--text);
+  margin-bottom: 24px;
+  position: relative;
+}
+.step:first-child .step-num::before,
+.step-num.active::before {
+  content: '';
+  position: absolute;
+  inset: -4px;
+  border: 1px solid var(--accent);
+  opacity: 0;
+}
+.step:nth-child(1) .step-num { background: var(--text); color: var(--bg); border-color: var(--text); }
+.step-title {
+  font-family: 'Bebas Neue', sans-serif;
+  font-size: 20px;
+  letter-spacing: 0.03em;
+  color: var(--text);
+  margin-bottom: 8px;
+}
+.step-desc {
+  font-size: 12px;
+  color: var(--muted);
+  line-height: 1.7;
+  font-family: 'Instrument Serif', serif;
+  font-style: italic;
+}
+
+/* ══ SOCIAL PROOF ══ */
+.social {
+  padding: 120px 40px;
+  background: var(--bg);
+}
+.social-inner {
+  max-width: 1100px;
+  margin: 0 auto;
+}
+.social-header {
+  display: flex;
+  align-items: end;
+  justify-content: space-between;
+  margin-bottom: 48px;
+}
+.testimonials {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 1px;
+  background: var(--border);
+  border: 1px solid var(--border);
+}
+.testimonial {
+  background: var(--surface);
+  padding: 32px 28px;
+}
+.t-quote {
+  font-family: 'Instrument Serif', serif;
+  font-style: italic;
+  font-size: 15px;
+  color: var(--text);
+  line-height: 1.7;
+  margin-bottom: 24px;
+  position: relative;
+}
+.t-quote::before {
+  content: '"';
+  font-size: 48px;
+  color: var(--accent);
+  opacity: 0.2;
+  line-height: 0;
+  vertical-align: -16px;
+  margin-right: 4px;
+}
+.t-author {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+}
+.t-av {
+  width: 34px; height: 34px;
+  background: var(--text);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-family: 'IBM Plex Mono', monospace;
+  font-size: 11px;
+  font-weight: 500;
+  color: var(--bg);
+  flex-shrink: 0;
+}
+.t-name {
+  font-size: 12px;
+  font-weight: 500;
+  color: var(--text);
+}
+.t-role {
+  font-size: 10px;
+  color: var(--hint);
+  font-family: 'IBM Plex Mono', monospace;
+}
+.t-stars {
+  display: flex;
+  gap: 2px;
+  margin-bottom: 16px;
+}
+.star { color: var(--accent); font-size: 11px; }
+
+/* University strip */
+.universities {
+  margin-top: 60px;
+  border: 1px solid var(--border);
+  background: var(--surface2);
+  padding: 24px 32px;
+  display: flex;
+  align-items: center;
+  gap: 24px;
+  flex-wrap: wrap;
+}
+.uni-label {
+  font-family: 'IBM Plex Mono', monospace;
+  font-size: 9px;
+  text-transform: uppercase;
+  letter-spacing: 0.12em;
+  color: var(--hint);
+  flex-shrink: 0;
+  padding-right: 24px;
+  border-right: 1px solid var(--border);
+}
+.uni-list {
+  display: flex;
+  gap: 24px;
+  flex-wrap: wrap;
+  align-items: center;
+}
+.uni-item {
+  font-family: 'IBM Plex Mono', monospace;
+  font-size: 10px;
+  color: var(--muted);
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
+  opacity: 0.7;
+}
+
+/* ══ CURRICULUM ══ */
+.curriculum {
+  padding: 120px 40px;
+  background: var(--text);
+  color: var(--bg);
+}
+.curriculum-inner {
+  max-width: 1100px;
+  margin: 0 auto;
+  display: grid;
+  grid-template-columns: 380px 1fr;
+  gap: 80px;
+  align-items: start;
+}
+.curriculum .section-label { color: var(--accent2); }
+.curriculum .section-label::after { background: rgba(255,255,255,0.1); }
+.curriculum .section-title { color: var(--bg); }
+.curriculum .section-sub { color: rgba(245,240,232,0.55); max-width: 100%; }
+.curriculum-note {
+  font-size: 12px;
+  color: rgba(245,240,232,0.4);
+  font-family: 'IBM Plex Mono', monospace;
+  margin-top: 24px;
+  line-height: 1.6;
+}
+.curriculum-note strong { color: rgba(245,240,232,0.7); }
+.year-block { margin-bottom: 4px; }
+.year-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 14px 20px;
+  background: rgba(245,240,232,0.04);
+  border: 1px solid rgba(245,240,232,0.08);
+  cursor: pointer;
+  transition: background .15s;
+  user-select: none;
+}
+.year-header:hover { background: rgba(245,240,232,0.07); }
+.year-header.open { border-color: rgba(196,70,10,0.3); background: rgba(196,70,10,0.05); }
+.year-name {
+  font-family: 'Bebas Neue', sans-serif;
+  font-size: 16px;
+  letter-spacing: 0.06em;
+  color: var(--bg);
+}
+.year-count {
+  font-family: 'IBM Plex Mono', monospace;
+  font-size: 9px;
+  color: rgba(245,240,232,0.35);
+  letter-spacing: 0.08em;
+}
+.year-arrow {
+  font-size: 10px;
+  color: rgba(245,240,232,0.35);
+  transition: transform .2s;
+}
+.year-header.open .year-arrow { transform: rotate(90deg); color: var(--accent2); }
+.year-items {
+  display: none;
+  border: 1px solid rgba(245,240,232,0.06);
+  border-top: none;
+}
+.year-items.open { display: block; }
+.year-item {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 10px 20px;
+  border-bottom: 1px solid rgba(245,240,232,0.04);
+  font-size: 12px;
+  color: rgba(245,240,232,0.6);
+  font-family: 'DM Sans', sans-serif;
+}
+.year-item:last-child { border-bottom: none; }
+.year-item:hover { color: var(--bg); }
+.yi-dot {
+  width: 5px; height: 5px;
+  border-radius: 50%;
+  background: rgba(245,240,232,0.2);
+  flex-shrink: 0;
+  margin-right: 12px;
+}
+.yi-dot.done { background: var(--teal); }
+.yi-dot.current { background: var(--accent2); }
+.yi-badge {
+  font-family: 'IBM Plex Mono', monospace;
+  font-size: 8px;
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
+  padding: 2px 7px;
+  border: 1px solid rgba(42,122,85,0.4);
+  color: rgba(42,122,85,0.9);
+  background: rgba(42,122,85,0.08);
+}
+
+/* ══ CTA FINAL ══ */
+.cta-final {
+  padding: 140px 40px;
+  background: var(--bg);
+  text-align: center;
+  position: relative;
+  overflow: hidden;
+}
+.cta-grid {
+  position: absolute;
+  inset: 0;
+  background-image:
+    repeating-linear-gradient(0deg, transparent, transparent 59px, rgba(26,18,8,0.025) 59px, rgba(26,18,8,0.025) 60px),
+    repeating-linear-gradient(90deg, transparent, transparent 59px, rgba(26,18,8,0.025) 59px, rgba(26,18,8,0.025) 60px);
+  pointer-events: none;
+}
+.cta-ring {
+  position: absolute;
+  border-radius: 50%;
+  border: 1px solid var(--border);
+  pointer-events: none;
+  top: 50%; left: 50%;
+  transform: translate(-50%, -50%);
+}
+.cta-ring-1 { width: 400px; height: 400px; opacity: 0.1; }
+.cta-ring-2 { width: 650px; height: 650px; opacity: 0.06; border-style: dashed; }
+.cta-inner { position: relative; z-index: 1; max-width: 640px; margin: 0 auto; }
+.cta-eyebrow {
+  font-family: 'IBM Plex Mono', monospace;
+  font-size: 10px;
+  letter-spacing: 0.16em;
+  text-transform: uppercase;
+  color: var(--accent);
+  margin-bottom: 20px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 12px;
+}
+.cta-eyebrow::before, .cta-eyebrow::after { content: ''; height: 1px; width: 28px; background: var(--accent); opacity: 0.5; }
+.cta-title {
+  font-family: 'Bebas Neue', sans-serif;
+  font-size: clamp(52px, 8vw, 100px);
+  letter-spacing: 0.03em;
+  line-height: 0.9;
+  color: var(--text);
+  margin-bottom: 20px;
+}
+.cta-title span { color: var(--accent); }
+.cta-sub {
+  font-family: 'Instrument Serif', serif;
+  font-style: italic;
+  font-size: 18px;
+  color: var(--muted);
+  line-height: 1.6;
+  margin-bottom: 40px;
+}
+.cta-input-row {
+  display: flex;
+  gap: 0;
+  max-width: 420px;
+  margin: 0 auto 16px;
+}
+.cta-input {
+  flex: 1;
+  background: var(--surface);
+  border: 1px solid var(--border);
+  border-right: none;
+  padding: 14px 18px;
+  font-size: 13px;
+  font-family: 'DM Sans', sans-serif;
+  color: var(--text);
+  outline: none;
+  transition: border-color .15s;
+}
+.cta-input::placeholder { color: var(--hint); }
+.cta-input:focus { border-color: var(--accent); }
+.cta-submit {
+  font-family: 'IBM Plex Mono', monospace;
+  font-size: 10px;
+  letter-spacing: 0.1em;
+  text-transform: uppercase;
+  background: var(--text);
+  color: var(--bg);
+  border: 1px solid var(--text);
+  padding: 14px 24px;
+  cursor: pointer;
+  white-space: nowrap;
+  transition: all .15s;
+}
+.cta-submit:hover { background: var(--accent); border-color: var(--accent); }
+.cta-note {
+  font-family: 'IBM Plex Mono', monospace;
+  font-size: 9px;
+  letter-spacing: 0.08em;
+  color: var(--hint);
+  text-transform: uppercase;
+}
+
+/* ══ FOOTER ══ */
+footer {
+  background: var(--text);
+  color: var(--bg);
+  padding: 60px 40px 32px;
+}
+.footer-inner {
+  max-width: 1100px;
+  margin: 0 auto;
+}
+.footer-top {
+  display: grid;
+  grid-template-columns: 1.4fr 1fr 1fr 1fr;
+  gap: 48px;
+  padding-bottom: 48px;
+  border-bottom: 1px solid rgba(245,240,232,0.08);
+  margin-bottom: 32px;
+}
+.footer-brand {}
+.footer-logo {
+  font-family: 'Bebas Neue', sans-serif;
+  font-size: 28px;
+  letter-spacing: 0.06em;
+  color: var(--bg);
+  margin-bottom: 8px;
+}
+.footer-logo span { color: var(--accent); }
+.footer-tagline {
+  font-family: 'Instrument Serif', serif;
+  font-style: italic;
+  font-size: 13px;
+  color: rgba(245,240,232,0.45);
+  margin-bottom: 20px;
+  line-height: 1.5;
+}
+.footer-col-title {
+  font-family: 'IBM Plex Mono', monospace;
+  font-size: 9px;
+  letter-spacing: 0.14em;
+  text-transform: uppercase;
+  color: rgba(245,240,232,0.35);
+  margin-bottom: 16px;
+}
+.footer-links { list-style: none; display: flex; flex-direction: column; gap: 10px; }
+.footer-links a {
+  font-size: 12px;
+  color: rgba(245,240,232,0.5);
+  text-decoration: none;
+  transition: color .15s;
+  font-family: 'DM Sans', sans-serif;
+}
+.footer-links a:hover { color: var(--bg); }
+.footer-bottom {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  font-family: 'IBM Plex Mono', monospace;
+  font-size: 9px;
+  letter-spacing: 0.06em;
+  color: rgba(245,240,232,0.25);
+  text-transform: uppercase;
+}
+.footer-bottom a { color: rgba(245,240,232,0.4); text-decoration: none; }
+.footer-bottom a:hover { color: var(--bg); }
+
+/* ══ SCROLL REVEAL ══ */
+.reveal {
+  opacity: 0;
+  transform: translateY(24px);
+  transition: opacity .7s ease, transform .7s ease;
+}
+.reveal.visible {
+  opacity: 1;
+  transform: translateY(0);
+}
+.reveal-delay-1 { transition-delay: .1s; }
+.reveal-delay-2 { transition-delay: .2s; }
+.reveal-delay-3 { transition-delay: .3s; }
+
+/* ══ MOBILE NAV DRAWER ══ */
+.nav-drawer {
+  position: fixed;
+  top: 0; right: 0; bottom: 0;
+  width: 280px;
+  background: var(--surface);
+  border-left: 1px solid var(--border);
+  z-index: 200;
+  transform: translateX(100%);
+  transition: transform .25s ease;
+  padding: 80px 32px 40px;
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+.nav-drawer.open { transform: translateX(0); }
+.nav-drawer a {
+  font-family: 'IBM Plex Mono', monospace;
+  font-size: 11px;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  color: var(--muted);
+  text-decoration: none;
+  padding: 12px 0;
+  border-bottom: 1px solid var(--border);
+  transition: color .15s;
+}
+.nav-drawer a:hover { color: var(--accent); }
+.nav-drawer-close {
+  position: absolute;
+  top: 18px; right: 18px;
+  background: none; border: none;
+  cursor: pointer; color: var(--muted); font-size: 20px;
+}
+.drawer-overlay {
+  display: none;
+  position: fixed; inset: 0;
+  background: rgba(26,18,8,0.4);
+  z-index: 190;
+  backdrop-filter: blur(2px);
+}
+.drawer-overlay.open { display: block; }
+
+/* ══ RESPONSIVE ══ */
+@media(max-width:900px) {
+  nav { padding: 0 20px; }
+  .nav-links { display: none; }
+  .nav-cta { display: none; }
+  .hamburger { display: block; }
+
+  .hero { padding: 100px 20px 60px; }
+  .hero-corner { display: none; }
+  .hero-stats { flex-direction: column; width: 100%; max-width: 320px; }
+  .hero-stat { border-right: none; border-bottom: 1px solid var(--border); width: 100%; }
+  .hero-stat:last-child { border-bottom: none; }
+
+  .about-inner { grid-template-columns: 1fr; gap: 48px; }
+  .features-header { grid-template-columns: 1fr; }
+  .features-grid { grid-template-columns: 1fr; }
+  .steps { grid-template-columns: 1fr 1fr; gap: 32px; }
+  .steps::before { display: none; }
+  .testimonials { grid-template-columns: 1fr; }
+  .curriculum-inner { grid-template-columns: 1fr; gap: 48px; }
+  .footer-top { grid-template-columns: 1fr 1fr; gap: 32px; }
+  .footer-bottom { flex-direction: column; gap: 8px; text-align: center; }
+
+  .about, .features, .how, .social, .curriculum, .cta-final { padding: 80px 20px; }
+  .social-header { flex-direction: column; align-items: flex-start; gap: 16px; }
+}
+
+@media(max-width:600px) {
+  nav { padding: 0 16px; }
+  .hero { padding: 90px 16px 50px; }
+  .hero-actions { flex-direction: column; align-items: center; width: 100%; }
+  .btn-primary-lg, .btn-ghost-lg { width: 100%; justify-content: center; }
+  .steps { grid-template-columns: 1fr; }
+  .footer-top { grid-template-columns: 1fr; }
+  .cta-input-row { flex-direction: column; }
+  .cta-input { border-right: 1px solid var(--border); border-bottom: none; }
+  .universities { flex-direction: column; align-items: flex-start; }
+  .uni-label { border-right: none; padding-right: 0; border-bottom: 1px solid var(--border); padding-bottom: 12px; width: 100%; }
+  .about, .features, .how, .social, .curriculum, .cta-final { padding: 64px 16px; }
+}
+</style>
+</head>
+<body>
+
+<!-- ══ NAV ══ -->
+<nav id="main-nav">
+  <a href="#" class="nav-logo">SUL<span>C</span>US</a>
+  <ul class="nav-links">
+    <li><a href="#features">Funcionalidades</a></li>
+    <li><a href="#como-funciona">Como funciona</a></li>
+    <li><a href="#curriculum">Currículo</a></li>
+    <li><a href="#depoimentos">Depoimentos</a></li>
+  </ul>
+  <div class="nav-cta">
+    <a href="#" class="btn-nav-ghost">Entrar</a>
+    <a href="#comecar" class="btn-nav-primary">Começar grátis →</a>
+  </div>
+  <button class="hamburger" id="hamburger" aria-label="Menu">
+    <svg width="20" height="20" viewBox="0 0 20 20" fill="none">
+      <path d="M2 5h16M2 10h16M2 15h16" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"/>
+    </svg>
+  </button>
+</nav>
+
+<!-- Mobile drawer -->
+<div class="drawer-overlay" id="drawer-overlay" onclick="closeDrawer()"></div>
+<div class="nav-drawer" id="nav-drawer">
+  <button class="nav-drawer-close" onclick="closeDrawer()">✕</button>
+  <a href="#features" onclick="closeDrawer()">Funcionalidades</a>
+  <a href="#como-funciona" onclick="closeDrawer()">Como funciona</a>
+  <a href="#curriculum" onclick="closeDrawer()">Currículo</a>
+  <a href="#depoimentos" onclick="closeDrawer()">Depoimentos</a>
+  <a href="#" onclick="closeDrawer()" style="margin-top:16px;color:var(--accent)">Entrar na plataforma →</a>
+</div>
+
+<!-- ══ HERO ══ -->
+<section class="hero">
+  <div class="hero-grid"></div>
+  <div class="hero-ring hero-ring-1"></div>
+  <div class="hero-ring hero-ring-2"></div>
+  <div class="hero-ring hero-ring-3"></div>
+  <div class="hero-corner tl"></div>
+  <div class="hero-corner tr"></div>
+  <div class="hero-corner bl"></div>
+  <div class="hero-corner br"></div>
+
+  <div class="hero-eyebrow">Plataforma de Estudo para Medicina</div>
+
+  <div class="hero-wordmark">
+    <div class="hero-title">SUL<span class="c">C</span>US</div>
+    <div class="hero-underline"></div>
+  </div>
+
+  <p class="hero-tagline">
+    Cada sulco cerebral aumenta a superfície do córtex.<br>
+    <strong>Cada conceito aprendido expande o teu pensamento.</strong>
+  </p>
+
+  <div class="hero-actions">
+    <a href="#comecar" class="btn-primary-lg">
+      Começar gratuitamente
+      <svg width="12" height="12" viewBox="0 0 12 12" fill="none"><path d="M2 6h8M6 2l4 4-4 4" stroke="currentColor" stroke-width="1.4" stroke-linecap="round" stroke-linejoin="round"/></svg>
+    </a>
+    <a href="#features" class="btn-ghost-lg">
+      Ver funcionalidades
+      <svg width="12" height="12" viewBox="0 0 12 12" fill="none"><path d="M6 2v8M2 6l4 4 4-4" stroke="currentColor" stroke-width="1.4" stroke-linecap="round" stroke-linejoin="round"/></svg>
+    </a>
+  </div>
+
+  <div class="hero-stats">
+    <div class="hero-stat">
+      <span class="hero-stat-val">14<span>+</span></span>
+      <span class="hero-stat-lbl">Disciplinas disponíveis</span>
+    </div>
+    <div class="hero-stat">
+      <span class="hero-stat-val">500<span>+</span></span>
+      <span class="hero-stat-lbl">Flashcards criados</span>
+    </div>
+    <div class="hero-stat">
+      <span class="hero-stat-val">6</span>
+      <span class="hero-stat-lbl">Anos do currículo</span>
+    </div>
+    <div class="hero-stat">
+      <span class="hero-stat-val">IA<span>.</span></span>
+      <span class="hero-stat-lbl">Professor integrado</span>
+    </div>
+  </div>
+
+  <div class="scroll-cue">
+    <span>Scroll</span>
+    <div class="scroll-line"></div>
+  </div>
+</section>
+
+<!-- ══ ABOUT ══ -->
+<section class="about">
+  <div class="about-inner">
+    <div class="reveal">
+      <div class="section-label">O que é o SULCUS</div>
+      <h2 class="section-title">Aprendizagem<br>que deixa<br>marca.</h2>
+      <p class="section-sub">Construído por e para estudantes de medicina portugueses — do básico ao clínico.</p>
+      <div class="about-text">
+        <p>O SULCUS não é mais uma plataforma genérica de estudo. É uma ferramenta desenhada especificamente para o <strong>currículo de medicina</strong>, com conteúdo organizado por disciplina, ano e semestre.</p>
+        <p>Combina resumos estruturados, mapas mentais interativos, revisão espaçada por flashcards e um professor de IA disponível 24/7 — tudo num ambiente limpo, sem distrações.</p>
+      </div>
+    </div>
+    <div class="reveal reveal-delay-2">
+      <div class="about-definition">
+        <div class="def-word">SUL<span>C</span>US</div>
+        <div class="def-phonetic">/ ˈsʌl.kəs /</div>
+        <div class="def-type">Substantivo · Anatomia</div>
+        <div class="def-meaning">Sulco ou fissura na superfície do encéfalo que separa os giros corticais, aumentando significativamente a área de superfície do córtex cerebral.</div>
+        <div class="def-anatomy">
+          Plural: sulci · A presença de sulcos profundos é característica de um encéfalo altamente desenvolvido. Quanto mais sulcos, maior a superfície disponível para processamento de informação.
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ══ FEATURES ══ -->
+<section class="features" id="features">
+  <div class="features-inner">
+    <div class="features-header">
+      <div class="reveal">
+        <div class="section-label">Funcionalidades</div>
+        <h2 class="section-title">Tudo o que<br>precisas.</h2>
+      </div>
+      <div class="reveal reveal-delay-1">
+        <p class="section-sub">Cada ferramenta foi desenhada para se complementar — do resumo ao exame, num único espaço.</p>
+      </div>
+    </div>
+    <div class="features-grid">
+
+      <div class="feature-card reveal">
+        <div class="feature-num">// 01</div>
+        <div class="feature-icon">
+          <svg width="18" height="18" viewBox="0 0 18 18" fill="none"><rect x="2" y="2" width="14" height="14" rx="0" stroke="#C4460A" stroke-width="1.3"/><path d="M5 6h8M5 9h8M5 12h5" stroke="#C4460A" stroke-width="1.3" stroke-linecap="round"/></svg>
+        </div>
+        <div class="feature-name">Resumos Estruturados</div>
+        <p class="feature-desc">Conteúdo organizado por disciplina, semestre e tópico — com conceitos-chave destacados e linguagem clínica precisa.</p>
+        <span class="feature-tag accent">Conteúdo próprio</span>
+      </div>
+
+      <div class="feature-card reveal reveal-delay-1">
+        <div class="feature-num">// 02</div>
+        <div class="feature-icon">
+          <svg width="18" height="18" viewBox="0 0 18 18" fill="none"><circle cx="9" cy="9" r="3" stroke="#2A7A55" stroke-width="1.3"/><circle cx="3.5" cy="4.5" r="1.8" stroke="#2A7A55" stroke-width="1.1"/><circle cx="14.5" cy="4.5" r="1.8" stroke="#2A7A55" stroke-width="1.1"/><circle cx="3.5" cy="13.5" r="1.8" stroke="#2A7A55" stroke-width="1.1"/><circle cx="14.5" cy="13.5" r="1.8" stroke="#2A7A55" stroke-width="1.1"/><line x1="6.2" y1="7.5" x2="4.8" y2="6" stroke="#2A7A55" stroke-width="1"/><line x1="11.8" y1="7.5" x2="13.2" y2="6" stroke="#2A7A55" stroke-width="1"/><line x1="6.2" y1="10.5" x2="4.8" y2="12" stroke="#2A7A55" stroke-width="1"/><line x1="11.8" y1="10.5" x2="13.2" y2="12" stroke="#2A7A55" stroke-width="1"/></svg>
+        </div>
+        <div class="feature-name">Mapas Mentais</div>
+        <p class="feature-desc">Visualiza as conexões entre conceitos de forma interativa. Clica em qualquer nó para aprofundar com a IA.</p>
+        <span class="feature-tag teal">Interativo</span>
+      </div>
+
+      <div class="feature-card reveal reveal-delay-2">
+        <div class="feature-num">// 03</div>
+        <div class="feature-icon">
+          <svg width="18" height="18" viewBox="0 0 18 18" fill="none"><rect x="2" y="4" width="14" height="10" rx="0" stroke="#8A6000" stroke-width="1.3"/><path d="M6.5 9h5M9 6.5v5" stroke="#8A6000" stroke-width="1.3" stroke-linecap="round"/></svg>
+        </div>
+        <div class="feature-name">Flashcards</div>
+        <p class="feature-desc">Revisão espaçada adaptada à tua taxa de acerto. Cria os teus próprios ou usa os que já estão na plataforma.</p>
+        <span class="feature-tag amber">Revisão espaçada</span>
+      </div>
+
+      <div class="feature-card reveal">
+        <div class="feature-num">// 04</div>
+        <div class="feature-icon">
+          <svg width="18" height="18" viewBox="0 0 18 18" fill="none"><circle cx="9" cy="9" r="6.5" stroke="#C4460A" stroke-width="1.3"/><path d="M9 6v3.5l2 2" stroke="#C4460A" stroke-width="1.3" stroke-linecap="round"/></svg>
+        </div>
+        <div class="feature-name">Professor IA</div>
+        <p class="feature-desc">Faz qualquer pergunta sobre a matéria e recebe uma resposta em português europeu, adaptada ao teu nível e disciplina.</p>
+        <span class="feature-tag accent">Powered by Claude</span>
+      </div>
+
+      <div class="feature-card reveal reveal-delay-1">
+        <div class="feature-num">// 05</div>
+        <div class="feature-icon">
+          <svg width="18" height="18" viewBox="0 0 18 18" fill="none"><path d="M2 14l4-5 3 3L13 6l3 3" stroke="#5A3E96" stroke-width="1.3" stroke-linecap="round" stroke-linejoin="round"/><path d="M2 14h14" stroke="#5A3E96" stroke-width="1.3" stroke-linecap="round"/></svg>
+        </div>
+        <div class="feature-name">Progresso Detalhado</div>
+        <p class="feature-desc">Acompanha o teu desempenho por disciplina, taxa de acerto nos flashcards e dias consecutivos de estudo.</p>
+        <span class="feature-tag teal">Analytics</span>
+      </div>
+
+      <div class="feature-card reveal reveal-delay-2">
+        <div class="feature-num">// 06</div>
+        <div class="feature-icon">
+          <svg width="18" height="18" viewBox="0 0 18 18" fill="none"><rect x="1.5" y="1.5" width="6" height="6" rx="0" stroke="#6B5B3E" stroke-width="1.2"/><rect x="10.5" y="1.5" width="6" height="6" rx="0" stroke="#6B5B3E" stroke-width="1.2"/><rect x="1.5" y="10.5" width="6" height="6" rx="0" stroke="#6B5B3E" stroke-width="1.2"/><rect x="10.5" y="10.5" width="6" height="6" rx="0" stroke="#6B5B3E" stroke-width="1.2"/></svg>
+        </div>
+        <div class="feature-name">Conteúdo Admin</div>
+        <p class="feature-desc">Professores e tutores podem adicionar e gerir matéria e flashcards diretamente na plataforma.</p>
+        <span class="feature-tag amber">Gestão de conteúdo</span>
+      </div>
+
+    </div>
+  </div>
+</section>
+
+<!-- ══ HOW IT WORKS ══ -->
+<section class="how" id="como-funciona">
+  <div class="how-inner">
+    <div class="how-header reveal">
+      <div class="section-label">Como funciona</div>
+      <h2 class="section-title">Quatro passos.<br>Um resultado.</h2>
+    </div>
+    <div class="steps">
+      <div class="step reveal">
+        <div class="step-num">01</div>
+        <div class="step-title">Cria a tua conta</div>
+        <p class="step-desc">Regista-te gratuitamente, escolhe o teu curso e ano, e personaliza a plataforma para o teu percurso.</p>
+      </div>
+      <div class="step reveal reveal-delay-1">
+        <div class="step-num">02</div>
+        <div class="step-title">Escolhe a disciplina</div>
+        <p class="step-desc">Navega pelo currículo organizado por ano e semestre. Seleciona a disciplina que queres estudar.</p>
+      </div>
+      <div class="step reveal reveal-delay-2">
+        <div class="step-num">03</div>
+        <div class="step-title">Estuda a fundo</div>
+        <p class="step-desc">Lê o resumo, explora o mapa mental interativo, faz flashcards e tira dúvidas com o professor IA.</p>
+      </div>
+      <div class="step reveal reveal-delay-3">
+        <div class="step-num">04</div>
+        <div class="step-title">Acompanha o progresso</div>
+        <p class="step-desc">Visualiza a tua evolução, identifica lacunas e volta às disciplinas onde precisas de reforço.</p>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ══ TESTIMONIALS ══ -->
+<section class="social" id="depoimentos">
+  <div class="social-inner">
+    <div class="social-header reveal">
+      <div>
+        <div class="section-label">Depoimentos</div>
+        <h2 class="section-title">O que dizem<br>os estudantes.</h2>
+      </div>
+      <p class="section-sub" style="max-width:300px;">Vozes reais de quem já usa o SULCUS no dia a dia de estudo.</p>
+    </div>
+    <div class="testimonials">
+      <div class="testimonial reveal">
+        <div class="t-stars"><span class="star">★</span><span class="star">★</span><span class="star">★</span><span class="star">★</span><span class="star">★</span></div>
+        <p class="t-quote">Os mapas mentais mudaram completamente a forma como consigo ligar os conceitos de fisiopatologia. Deixei de estudar em silos.</p>
+        <div class="t-author">
+          <div class="t-av">MS</div>
+          <div>
+            <div class="t-name">Miguel S.</div>
+            <div class="t-role">// Medicina — 3.º Ano · FMUL</div>
+          </div>
+        </div>
+      </div>
+      <div class="testimonial reveal reveal-delay-1">
+        <div class="t-stars"><span class="star">★</span><span class="star">★</span><span class="star">★</span><span class="star">★</span><span class="star">★</span></div>
+        <p class="t-quote">O professor IA responde em português europeu e adapta-se ao que estou a estudar. É como ter um tutor pessoal a qualquer hora.</p>
+        <div class="t-author">
+          <div class="t-av">AC</div>
+          <div>
+            <div class="t-name">Ana C.</div>
+            <div class="t-role">// Medicina — 2.º Ano · FMUP</div>
+          </div>
+        </div>
+      </div>
+      <div class="testimonial reveal reveal-delay-2">
+        <div class="t-stars"><span class="star">★</span><span class="star">★</span><span class="star">★</span><span class="star">★</span><span class="star">★</span></div>
+        <p class="t-quote">Finalmente uma plataforma pensada para o currículo português. Os resumos já estão organizados por semestre — poupei horas de preparação.</p>
+        <div class="t-author">
+          <div class="t-av">TF</div>
+          <div>
+            <div class="t-name">Tomás F.</div>
+            <div class="t-role">// Medicina — 4.º Ano · UBI</div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <div class="universities reveal">
+      <div class="uni-label">Usado em</div>
+      <div class="uni-list">
+        <span class="uni-item">FMUL</span>
+        <span class="uni-item">FMUP</span>
+        <span class="uni-item">FMUC</span>
+        <span class="uni-item">UBI</span>
+        <span class="uni-item">NMS|FCM</span>
+        <span class="uni-item">ICBAS</span>
+        <span class="uni-item">UAlg</span>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ══ CURRICULUM ══ -->
+<section class="curriculum" id="curriculum">
+  <div class="curriculum-inner">
+    <div class="reveal">
+      <div class="section-label">Currículo</div>
+      <h2 class="section-title" style="color:var(--bg);">6 anos.<br>14 disciplinas.<br>1 plataforma.</h2>
+      <p class="section-sub">Conteúdo mapeado para o currículo de medicina português, do Ciclo Básico ao Ciclo Clínico.</p>
+      <div class="curriculum-note">
+        <strong>Ciclo Básico</strong> — disponível agora<br>
+        <strong>Ciclo Clínico</strong> — em desenvolvimento<br><br>
+        Novos conteúdos são adicionados regularmente por professores e tutores parceiros.
+      </div>
+    </div>
+    <div class="reveal reveal-delay-1">
+
+      <div class="year-block">
+        <div class="year-header open" onclick="toggleYear(this)">
+          <div>
+            <div class="year-name">Ciclo Básico — 1.º Ano</div>
+          </div>
+          <div style="display:flex;align-items:center;gap:12px;">
+            <span class="year-count">5 disciplinas</span>
+            <span class="year-arrow">›</span>
+          </div>
+        </div>
+        <div class="year-items open">
+          <div class="year-item"><div style="display:flex;align-items:center;"><div class="yi-dot done"></div>Filosofia</div><span class="yi-badge">Disponível</span></div>
+          <div class="year-item"><div style="display:flex;align-items:center;"><div class="yi-dot done"></div>Bioquímica</div><span class="yi-badge">Disponível</span></div>
+          <div class="year-item"><div style="display:flex;align-items:center;"><div class="yi-dot done"></div>Biomedicina</div><span class="yi-badge">Disponível</span></div>
+          <div class="year-item"><div style="display:flex;align-items:center;"><div class="yi-dot done"></div>Anatomia Locomotora</div><span class="yi-badge">Disponível</span></div>
+          <div class="year-item"><div style="display:flex;align-items:center;"><div class="yi-dot done"></div>Histologia Geral</div><span class="yi-badge">Disponível</span></div>
+        </div>
+      </div>
+
+      <div class="year-block">
+        <div class="year-header" onclick="toggleYear(this)">
+          <div>
+            <div class="year-name">Ciclo Básico — 2.º Ano</div>
+          </div>
+          <div style="display:flex;align-items:center;gap:12px;">
+            <span class="year-count">5 disciplinas</span>
+            <span class="year-arrow">›</span>
+          </div>
+        </div>
+        <div class="year-items">
+          <div class="year-item"><div style="display:flex;align-items:center;"><div class="yi-dot done"></div>Histologia Especial</div><span class="yi-badge">Disponível</span></div>
+          <div class="year-item"><div style="display:flex;align-items:center;"><div class="yi-dot done"></div>Fisiologia Geral</div><span class="yi-badge">Disponível</span></div>
+          <div class="year-item"><div style="display:flex;align-items:center;"><div class="yi-dot current"></div>Neuroanatomia</div><span class="yi-badge">Disponível</span></div>
+          <div class="year-item"><div style="display:flex;align-items:center;"><div class="yi-dot"></div>Embriologia Especial</div><span class="yi-badge">Disponível</span></div>
+          <div class="year-item"><div style="display:flex;align-items:center;"><div class="yi-dot"></div>Anatomia Esplâncnica</div><span class="yi-badge">Disponível</span></div>
+        </div>
+      </div>
+
+      <div class="year-block">
+        <div class="year-header" onclick="toggleYear(this)">
+          <div>
+            <div class="year-name">Ciclo Clínico — 3.º ao 6.º Ano</div>
+          </div>
+          <div style="display:flex;align-items:center;gap:12px;">
+            <span class="year-count">Em breve</span>
+            <span class="year-arrow">›</span>
+          </div>
+        </div>
+        <div class="year-items">
+          <div class="year-item" style="opacity:.5;font-style:italic;font-family:'Instrument Serif',serif;color:rgba(245,240,232,0.4);justify-content:center;">
+            Cardiologia, Neurologia, Medicina Interna e mais — em desenvolvimento.
+          </div>
+        </div>
+      </div>
+
+    </div>
+  </div>
+</section>
+
+<!-- ══ CTA FINAL ══ -->
+<section class="cta-final" id="comecar">
+  <div class="cta-grid"></div>
+  <div class="cta-ring cta-ring-1"></div>
+  <div class="cta-ring cta-ring-2"></div>
+  <div class="cta-inner reveal">
+    <div class="cta-eyebrow">Começa hoje</div>
+    <h2 class="cta-title">Estuda como<br>o teu <span>cérebro</span><br>foi feito.</h2>
+    <p class="cta-sub">Grátis para começar. Sem cartão de crédito. Sem distrações.</p>
+    <div class="cta-input-row">
+      <input class="cta-input" type="email" placeholder="o.teu@email.com" id="cta-email">
+      <button class="cta-submit" onclick="ctaSubmit()">Entrar gratuitamente →</button>
+    </div>
+    <p class="cta-note">Junta-te a centenas de estudantes de medicina</p>
+  </div>
+</section>
+
+<!-- ══ FOOTER ══ -->
+<footer>
+  <div class="footer-inner">
+    <div class="footer-top">
+      <div class="footer-brand">
+        <div class="footer-logo">SUL<span>C</span>US</div>
+        <p class="footer-tagline">Aprendizagem que deixa marca.<br>Construído para estudantes de medicina portugueses.</p>
+        <div style="font-family:'IBM Plex Mono',monospace;font-size:9px;color:rgba(245,240,232,0.25);letter-spacing:0.06em;text-transform:uppercase;">
+          // Aprendizagem que deixa marca
+        </div>
+      </div>
+      <div>
+        <div class="footer-col-title">Plataforma</div>
+        <ul class="footer-links">
+          <li><a href="#">Resumos</a></li>
+          <li><a href="#">Mapas Mentais</a></li>
+          <li><a href="#">Flashcards</a></li>
+          <li><a href="#">Professor IA</a></li>
+          <li><a href="#">Progresso</a></li>
+        </ul>
+      </div>
+      <div>
+        <div class="footer-col-title">Currículo</div>
+        <ul class="footer-links">
+          <li><a href="#">1.º Ano</a></li>
+          <li><a href="#">2.º Ano</a></li>
+          <li><a href="#">Ciclo Clínico</a></li>
+          <li><a href="#">Todas as disciplinas</a></li>
+        </ul>
+      </div>
+      <div>
+        <div class="footer-col-title">Conta</div>
+        <ul class="footer-links">
+          <li><a href="#">Entrar</a></li>
+          <li><a href="#">Criar conta</a></li>
+          <li><a href="#">Para professores</a></li>
+          <li><a href="#">Contacto</a></li>
+        </ul>
+      </div>
+    </div>
+    <div class="footer-bottom">
+      <span>© 2025 SULCUS — Todos os direitos reservados</span>
+      <div style="display:flex;gap:20px;">
+        <a href="#">Privacidade</a>
+        <a href="#">Termos</a>
+        <a href="#">Cookies</a>
+      </div>
+    </div>
+  </div>
+</footer>
+
+<script>
+/* ── Nav scroll ── */
+const nav = document.getElementById('main-nav');
+window.addEventListener('scroll', () => {
+  nav.classList.toggle('scrolled', window.scrollY > 20);
+});
+
+/* ── Mobile drawer ── */
+document.getElementById('hamburger').addEventListener('click', () => {
+  document.getElementById('nav-drawer').classList.add('open');
+  document.getElementById('drawer-overlay').classList.add('open');
+  document.body.style.overflow = 'hidden';
+});
+function closeDrawer() {
+  document.getElementById('nav-drawer').classList.remove('open');
+  document.getElementById('drawer-overlay').classList.remove('open');
+  document.body.style.overflow = '';
+}
+
+/* ── Scroll reveal ── */
+const revealEls = document.querySelectorAll('.reveal');
+const observer = new IntersectionObserver((entries) => {
+  entries.forEach(e => {
+    if (e.isIntersecting) {
+      e.target.classList.add('visible');
+      observer.unobserve(e.target);
+    }
+  });
+}, { threshold: 0.12, rootMargin: '0px 0px -40px 0px' });
+revealEls.forEach(el => observer.observe(el));
+
+/* ── Curriculum accordion ── */
+function toggleYear(header) {
+  const items = header.nextElementSibling;
+  const isOpen = header.classList.contains('open');
+  header.classList.toggle('open', !isOpen);
+  items.classList.toggle('open', !isOpen);
+}
+
+/* ── CTA submit ── */
+function ctaSubmit() {
+  const email = document.getElementById('cta-email').value.trim();
+  if (!email || !email.includes('@')) {
+    document.getElementById('cta-email').style.borderColor = '#C4460A';
+    document.getElementById('cta-email').focus();
+    return;
+  }
+  document.getElementById('cta-email').style.borderColor = '#2A7A55';
+  document.querySelector('.cta-submit').textContent = 'Conta criada ✓';
+  document.querySelector('.cta-submit').style.background = '#2A7A55';
+  document.querySelector('.cta-submit').style.borderColor = '#2A7A55';
+}
+</script>
+</body>
+</html>
