@@ -1,0 +1,1984 @@
+<!DOCTYPE html>
+<html lang="pt">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>SULCUS — Aprendizagem que Deixa Marca</title>
+<link href="https://fonts.googleapis.com/css2?family=Bebas+Neue&family=Instrument+Serif:ital@0;1&family=IBM+Plex+Mono:wght@400;500&family=DM+Sans:opsz,wght@9..40,300;9..40,400;9..40,500&display=swap" rel="stylesheet">
+<style>
+/* ══════════════════════════════════════════
+   TOKENS
+══════════════════════════════════════════ */
+:root {
+  --bg:#F5F0E8; --surface:#FFFFFF; --surface2:#EDE8DC; --surface3:#E4DDD0;
+  --border:#C4B99A; --border2:#A89880;
+  --text:#1A1208; --muted:#6B5B3E; --hint:#A89880;
+  --accent:#C4460A; --accent2:#E05A1A;
+  --teal:#2A7A55; --teal-bg:#E8F5EE;
+  --amber:#8A6000; --amber-bg:#FDF3DC;
+  --red:#A32020; --red-bg:#FDEAEA;
+  --r:0px; --rs:0px;
+}
+*,*::before,*::after{box-sizing:border-box;margin:0;padding:0;}
+html{scroll-behavior:smooth;}
+body{font-family:'DM Sans',sans-serif;background:var(--bg);color:var(--text);font-size:15px;line-height:1.6;overflow-x:hidden;}
+a{text-decoration:none;color:inherit;}
+button{font-family:'DM Sans',sans-serif;cursor:pointer;}
+::-webkit-scrollbar{width:3px;} ::-webkit-scrollbar-thumb{background:var(--border);}
+
+/* noise overlay */
+body::before{
+  content:'';position:fixed;inset:0;
+  background-image:url("data:image/svg+xml,%3Csvg viewBox='0 0 256 256' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)' opacity='0.04'/%3E%3C/svg%3E");
+  pointer-events:none;z-index:999;opacity:0.35;
+}
+
+/* ══════════════════════════════════════════
+   PAGES
+══════════════════════════════════════════ */
+.page{display:none;}
+.page.active{display:block;}
+#page-landing.active{display:block;}
+
+/* ══════════════════════════════════════════
+   LANDING — NAV
+══════════════════════════════════════════ */
+.l-nav{
+  position:fixed;top:0;left:0;right:0;z-index:200;height:56px;
+  display:flex;align-items:center;justify-content:space-between;padding:0 40px;
+  background:rgba(245,240,232,0.92);backdrop-filter:blur(12px);
+  border-bottom:1px solid transparent;transition:border-color .3s;
+}
+.l-nav.scrolled{border-bottom-color:var(--border);}
+.nav-logo{font-family:'Bebas Neue',sans-serif;font-size:24px;letter-spacing:0.06em;color:var(--text);}
+.nav-logo span{color:var(--accent);}
+.nav-links{display:flex;align-items:center;gap:32px;list-style:none;}
+.nav-links a{font-family:'IBM Plex Mono',monospace;font-size:10px;letter-spacing:0.1em;text-transform:uppercase;color:var(--muted);transition:color .15s;}
+.nav-links a:hover{color:var(--text);}
+.nav-cta-group{display:flex;align-items:center;gap:10px;}
+.btn-nav-ghost{font-family:'IBM Plex Mono',monospace;font-size:10px;letter-spacing:0.08em;text-transform:uppercase;color:var(--muted);background:none;border:1px solid var(--border);padding:8px 18px;transition:all .15s;display:inline-block;}
+.btn-nav-ghost:hover{border-color:var(--border2);color:var(--text);}
+.btn-nav-primary{font-family:'IBM Plex Mono',monospace;font-size:10px;letter-spacing:0.08em;text-transform:uppercase;color:var(--bg);background:var(--text);border:1px solid var(--text);padding:8px 18px;transition:all .15s;display:inline-block;}
+.btn-nav-primary:hover{background:var(--accent);border-color:var(--accent);}
+
+/* ══════════════════════════════════════════
+   LANDING — HERO
+══════════════════════════════════════════ */
+.hero{
+  min-height:100dvh;display:flex;flex-direction:column;align-items:center;justify-content:center;
+  position:relative;overflow:hidden;padding:80px 40px 60px;text-align:center;
+}
+.hero-grid{
+  position:absolute;inset:0;pointer-events:none;
+  background-image:
+    repeating-linear-gradient(0deg,transparent,transparent 59px,rgba(26,18,8,0.035) 59px,rgba(26,18,8,0.035) 60px),
+    repeating-linear-gradient(90deg,transparent,transparent 59px,rgba(26,18,8,0.035) 59px,rgba(26,18,8,0.035) 60px);
+}
+.hero-ring{position:absolute;border-radius:50%;border:1px solid var(--border);pointer-events:none;top:50%;left:50%;transform:translate(-50%,-50%);}
+.hero-ring-1{width:340px;height:340px;opacity:0.15;animation:ringPulse 8s ease-in-out infinite;}
+.hero-ring-2{width:560px;height:560px;opacity:0.08;border-style:dashed;animation:ringPulse 12s ease-in-out infinite reverse;}
+.hero-ring-3{width:780px;height:780px;opacity:0.05;animation:ringPulse 16s ease-in-out infinite;}
+@keyframes ringPulse{0%,100%{transform:translate(-50%,-50%) scale(1);}50%{transform:translate(-50%,-50%) scale(1.04);}}
+
+.hero-corner{position:absolute;width:18px;height:18px;pointer-events:none;opacity:0.25;}
+.hero-corner::before,.hero-corner::after{content:'';position:absolute;background:var(--text);}
+.hero-corner::before{width:100%;height:1px;top:0;left:0;}
+.hero-corner::after{width:1px;height:100%;top:0;left:0;}
+.hero-corner.tl{top:32px;left:32px;}
+.hero-corner.tr{top:32px;right:32px;transform:scaleX(-1);}
+.hero-corner.bl{bottom:32px;left:32px;transform:scaleY(-1);}
+.hero-corner.br{bottom:32px;right:32px;transform:scale(-1);}
+
+.hero-eyebrow{
+  font-family:'IBM Plex Mono',monospace;font-size:10px;letter-spacing:0.18em;text-transform:uppercase;
+  color:var(--accent);margin-bottom:24px;display:flex;align-items:center;gap:12px;
+  opacity:0;animation:fadeUp .6s .1s ease forwards;
+}
+.hero-eyebrow::before,.hero-eyebrow::after{content:'';height:1px;width:32px;background:var(--accent);opacity:0.5;}
+
+.hero-wordmark{display:inline-block;opacity:0;animation:heroWm .9s .25s cubic-bezier(0.16,1,0.3,1) forwards;}
+@keyframes heroWm{from{opacity:0;transform:perspective(700px) rotateX(12deg) translateY(30px);}to{opacity:1;transform:perspective(700px) rotateX(0deg) translateY(0);}}
+.hero-title{font-family:'Bebas Neue',sans-serif;font-size:clamp(100px,18vw,220px);letter-spacing:0.04em;line-height:0.88;color:var(--text);display:block;text-shadow:3px 3px 0 rgba(196,70,10,0.07),6px 6px 0 rgba(26,18,8,0.04);}
+.hero-title .c{color:var(--accent);}
+.hero-underline{height:2px;background:linear-gradient(90deg,transparent,var(--accent) 30%,var(--accent) 70%,transparent);margin-top:8px;animation:underlineGrow 1s .8s ease forwards;transform-origin:center;transform:scaleX(0);}
+@keyframes underlineGrow{to{transform:scaleX(1);}}
+
+.hero-tagline{font-family:'Instrument Serif',serif;font-style:italic;font-size:clamp(17px,2.2vw,24px);color:var(--muted);margin-top:28px;max-width:520px;line-height:1.55;opacity:0;animation:fadeUp .6s .55s ease forwards;}
+.hero-tagline strong{color:var(--text);font-style:normal;}
+
+.hero-actions{display:flex;gap:12px;margin-top:40px;flex-wrap:wrap;justify-content:center;opacity:0;animation:fadeUp .6s .7s ease forwards;}
+.btn-lg{font-family:'IBM Plex Mono',monospace;font-size:11px;letter-spacing:0.1em;text-transform:uppercase;padding:14px 32px;display:inline-flex;align-items:center;gap:10px;transition:all .2s;}
+.btn-lg-primary{background:var(--text);color:var(--bg);border:none;}
+.btn-lg-primary:hover{background:var(--accent);}
+.btn-lg-ghost{background:transparent;color:var(--muted);border:1px solid var(--border);}
+.btn-lg-ghost:hover{border-color:var(--accent);color:var(--accent);}
+
+.hero-stats{display:flex;align-items:center;gap:0;margin-top:56px;border:1px solid var(--border);background:var(--surface);opacity:0;animation:fadeUp .6s .85s ease forwards;}
+.hero-stat{padding:16px 32px;border-right:1px solid var(--border);text-align:center;}
+.hero-stat:last-child{border-right:none;}
+.hero-stat-val{font-family:'Bebas Neue',sans-serif;font-size:28px;letter-spacing:0.04em;color:var(--text);display:block;}
+.hero-stat-val span{color:var(--accent);}
+.hero-stat-lbl{font-family:'IBM Plex Mono',monospace;font-size:9px;letter-spacing:0.1em;text-transform:uppercase;color:var(--hint);display:block;margin-top:2px;}
+
+.scroll-cue{position:absolute;bottom:28px;left:50%;transform:translateX(-50%);display:flex;flex-direction:column;align-items:center;gap:6px;opacity:0;animation:fadeUp .5s 1.2s ease forwards;}
+.scroll-cue span{font-family:'IBM Plex Mono',monospace;font-size:9px;letter-spacing:0.12em;text-transform:uppercase;color:var(--hint);}
+.scroll-line{width:1px;height:36px;background:linear-gradient(to bottom,var(--border),transparent);animation:scrollLine 2s ease-in-out infinite;}
+@keyframes scrollLine{0%{transform:scaleY(0);transform-origin:top;}50%{transform:scaleY(1);transform-origin:top;}51%{transform:scaleY(1);transform-origin:bottom;}100%{transform:scaleY(0);transform-origin:bottom;}}
+@keyframes fadeUp{from{opacity:0;transform:translateY(16px);}to{opacity:1;transform:translateY(0);}}
+
+/* ══════════════════════════════════════════
+   LANDING — SECTIONS
+══════════════════════════════════════════ */
+.reveal{opacity:0;transform:translateY(16px);transition:opacity .5s ease,transform .5s ease;}
+.reveal.visible{opacity:1;transform:translateY(0);}
+.reveal-delay-1{transition-delay:.12s;}
+.reveal-delay-2{transition-delay:.24s;}
+
+.section-label{font-family:'IBM Plex Mono',monospace;font-size:9px;letter-spacing:0.16em;text-transform:uppercase;color:var(--accent);display:flex;align-items:center;gap:10px;margin-bottom:16px;}
+.section-label::after{content:'';flex:1;height:1px;background:var(--border);max-width:60px;}
+.section-title{font-family:'Bebas Neue',sans-serif;font-size:clamp(38px,6vw,72px);letter-spacing:0.03em;line-height:0.92;color:var(--text);margin-bottom:16px;}
+.section-sub{font-family:'Instrument Serif',serif;font-style:italic;font-size:clamp(15px,1.8vw,18px);color:var(--muted);line-height:1.6;max-width:480px;}
+
+/* about */
+.about{padding:120px 40px;background:var(--text);color:var(--bg);overflow:hidden;}
+.about-inner{max-width:1100px;margin:0 auto;display:grid;grid-template-columns:1fr 1fr;gap:80px;align-items:center;}
+.about .section-label{color:var(--accent2);}
+.about .section-label::after{background:rgba(255,255,255,0.12);}
+.about .section-title{color:var(--bg);}
+.about .section-sub{color:rgba(245,240,232,0.65);max-width:100%;}
+.about-text{font-size:14px;color:rgba(245,240,232,0.55);line-height:1.8;margin-top:20px;}
+.about-text p{margin-bottom:14px;}
+.about-text strong{color:var(--bg);}
+.about-definition{position:relative;border:1px solid rgba(245,240,232,0.12);padding:40px;background:rgba(245,240,232,0.04);}
+.about-definition::before{content:'"';position:absolute;top:-20px;left:32px;font-family:'Instrument Serif',serif;font-size:80px;color:var(--accent);line-height:1;opacity:0.6;}
+.def-word{font-family:'Bebas Neue',sans-serif;font-size:48px;letter-spacing:0.06em;color:var(--bg);margin-bottom:4px;}
+.def-word span{color:var(--accent);}
+.def-phonetic{font-family:'IBM Plex Mono',monospace;font-size:11px;color:rgba(245,240,232,0.4);margin-bottom:20px;letter-spacing:0.04em;}
+.def-type{font-family:'IBM Plex Mono',monospace;font-size:9px;text-transform:uppercase;letter-spacing:0.12em;color:var(--accent2);margin-bottom:10px;}
+.def-meaning{font-family:'Instrument Serif',serif;font-style:italic;font-size:16px;color:rgba(245,240,232,0.75);line-height:1.6;border-left:2px solid var(--accent);padding-left:16px;margin-bottom:16px;}
+.def-anatomy{font-size:12px;color:rgba(245,240,232,0.4);font-family:'IBM Plex Mono',monospace;line-height:1.6;}
+
+/* features */
+.features{padding:120px 40px;background:var(--bg);}
+.features-inner{max-width:1100px;margin:0 auto;}
+.features-header{display:grid;grid-template-columns:1fr 1fr;gap:40px;align-items:end;margin-bottom:60px;}
+.features-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:1px;background:var(--border);border:1px solid var(--border);}
+.feature-card{background:var(--bg);padding:36px 28px;position:relative;transition:background .2s;}
+.feature-card:hover{background:var(--surface);}
+.feature-card::after{content:'';position:absolute;bottom:0;left:0;width:0;height:2px;background:var(--accent);transition:width .3s ease;}
+.feature-card:hover::after{width:100%;}
+.feature-icon{width:40px;height:40px;border:1px solid var(--border);display:flex;align-items:center;justify-content:center;margin-bottom:20px;background:var(--surface2);}
+.feature-num{font-family:'IBM Plex Mono',monospace;font-size:9px;color:var(--hint);letter-spacing:0.1em;margin-bottom:10px;text-transform:uppercase;}
+.feature-name{font-family:'Bebas Neue',sans-serif;font-size:22px;letter-spacing:0.04em;color:var(--text);margin-bottom:10px;}
+.feature-desc{font-size:13px;color:var(--muted);line-height:1.7;font-family:'Instrument Serif',serif;font-style:italic;}
+.feature-tag{display:inline-block;margin-top:16px;font-family:'IBM Plex Mono',monospace;font-size:9px;letter-spacing:0.08em;text-transform:uppercase;padding:3px 8px;border:1px solid;}
+.feature-tag.teal{color:var(--teal);border-color:rgba(42,122,85,0.3);background:var(--teal-bg);}
+.feature-tag.amber{color:var(--amber);border-color:rgba(138,96,0,0.3);background:var(--amber-bg);}
+.feature-tag.accent{color:var(--accent);border-color:rgba(196,70,10,0.25);background:rgba(196,70,10,0.06);}
+
+/* how */
+.how{padding:120px 40px;background:var(--surface2);}
+.how-inner{max-width:1100px;margin:0 auto;}
+.how-header{margin-bottom:64px;}
+.steps{display:grid;grid-template-columns:repeat(4,1fr);gap:0;position:relative;}
+.steps::before{content:'';position:absolute;top:28px;left:calc(12.5%);right:calc(12.5%);height:1px;background:var(--border);z-index:0;}
+.step{padding:0 20px;position:relative;z-index:1;}
+.step-num{width:56px;height:56px;border:1px solid var(--border);background:var(--bg);display:flex;align-items:center;justify-content:center;font-family:'Bebas Neue',sans-serif;font-size:22px;letter-spacing:0.04em;color:var(--text);margin-bottom:24px;}
+.step:nth-child(1) .step-num{background:var(--text);color:var(--bg);border-color:var(--text);}
+.step-title{font-family:'Bebas Neue',sans-serif;font-size:20px;letter-spacing:0.03em;color:var(--text);margin-bottom:8px;}
+.step-desc{font-size:12px;color:var(--muted);line-height:1.7;font-family:'Instrument Serif',serif;font-style:italic;}
+
+/* social */
+.social{padding:120px 40px;background:var(--bg);}
+.social-inner{max-width:1100px;margin:0 auto;}
+.social-header{display:flex;align-items:end;justify-content:space-between;margin-bottom:48px;}
+.testimonials{display:grid;grid-template-columns:repeat(3,1fr);gap:1px;background:var(--border);border:1px solid var(--border);}
+.testimonial{background:var(--surface);padding:32px 28px;}
+.t-quote{font-family:'Instrument Serif',serif;font-style:italic;font-size:15px;color:var(--text);line-height:1.7;margin-bottom:24px;position:relative;}
+.t-quote::before{content:'"';font-size:48px;color:var(--accent);opacity:0.2;line-height:0;vertical-align:-16px;margin-right:4px;}
+.t-stars{display:flex;gap:2px;margin-bottom:16px;}
+.star{color:var(--amber);font-size:12px;}
+.t-av{width:36px;height:36px;background:var(--text);color:var(--bg);display:flex;align-items:center;justify-content:center;font-size:11px;font-weight:500;font-family:'IBM Plex Mono',monospace;flex-shrink:0;}
+.t-author{display:flex;align-items:center;gap:10px;}
+.t-name{font-size:13px;font-weight:500;}
+.t-role{font-size:10px;color:var(--muted);font-family:'IBM Plex Mono',monospace;margin-top:2px;}
+
+/* curriculum */
+.curriculum{padding:120px 40px;background:var(--text);}
+.curriculum-inner{max-width:1100px;margin:0 auto;display:grid;grid-template-columns:1fr 1fr;gap:80px;align-items:start;}
+.curriculum .section-label{color:var(--accent2);}
+.curriculum .section-label::after{background:rgba(255,255,255,0.12);}
+.curriculum .section-title{color:var(--bg);}
+.curriculum .section-sub{color:rgba(245,240,232,0.6);}
+.curriculum-note{font-size:12px;color:rgba(245,240,232,0.45);line-height:1.8;margin-top:24px;font-family:'IBM Plex Mono',monospace;}
+.curriculum-note strong{color:rgba(245,240,232,0.7);}
+.year-block{border:1px solid rgba(245,240,232,0.1);margin-bottom:8px;}
+.year-header{display:flex;align-items:center;justify-content:space-between;padding:14px 18px;cursor:pointer;transition:background .15s;}
+.year-header:hover,.year-header.open{background:rgba(245,240,232,0.04);}
+.year-name{font-family:'Bebas Neue',sans-serif;font-size:18px;letter-spacing:0.04em;color:var(--bg);}
+.year-count{font-family:'IBM Plex Mono',monospace;font-size:9px;color:rgba(245,240,232,0.35);text-transform:uppercase;letter-spacing:0.08em;}
+.year-arrow{font-size:18px;color:rgba(245,240,232,0.3);transition:transform .2s;}
+.year-header.open .year-arrow{transform:rotate(90deg);}
+.year-items{display:none;border-top:1px solid rgba(245,240,232,0.08);}
+.year-items.open{display:block;}
+.year-item{display:flex;align-items:center;justify-content:space-between;padding:10px 18px;border-bottom:1px solid rgba(245,240,232,0.06);font-size:13px;color:rgba(245,240,232,0.7);}
+.year-item:last-child{border-bottom:none;}
+.yi-dot{width:6px;height:6px;border-radius:50%;background:rgba(245,240,232,0.2);margin-right:10px;flex-shrink:0;}
+.yi-dot.done{background:var(--teal);}
+.yi-dot.current{background:var(--accent);}
+.yi-badge{font-family:'IBM Plex Mono',monospace;font-size:9px;letter-spacing:0.06em;text-transform:uppercase;color:var(--teal);padding:2px 8px;border:1px solid rgba(42,122,85,0.3);background:rgba(42,122,85,0.08);}
+
+/* cta final */
+.cta-final{padding:120px 40px;background:var(--surface2);position:relative;overflow:hidden;text-align:center;}
+.cta-grid{position:absolute;inset:0;background-image:repeating-linear-gradient(0deg,transparent,transparent 59px,rgba(26,18,8,0.025) 59px,rgba(26,18,8,0.025) 60px),repeating-linear-gradient(90deg,transparent,transparent 59px,rgba(26,18,8,0.025) 59px,rgba(26,18,8,0.025) 60px);pointer-events:none;}
+.cta-eyebrow{font-family:'IBM Plex Mono',monospace;font-size:9px;letter-spacing:0.18em;text-transform:uppercase;color:var(--accent);margin-bottom:20px;display:block;}
+.cta-title{font-family:'Bebas Neue',sans-serif;font-size:clamp(52px,9vw,110px);letter-spacing:0.03em;line-height:0.9;color:var(--text);margin-bottom:24px;}
+.cta-title span{color:var(--accent);}
+.cta-sub{font-family:'Instrument Serif',serif;font-style:italic;font-size:17px;color:var(--muted);margin-bottom:40px;}
+.cta-input-row{display:flex;gap:0;max-width:420px;margin:0 auto 16px;}
+.cta-input{flex:1;background:var(--surface);border:1px solid var(--border);border-right:none;padding:14px 18px;font-size:13px;font-family:'DM Sans',sans-serif;color:var(--text);outline:none;transition:border-color .15s;}
+.cta-input:focus{border-color:var(--accent);}
+.cta-input::placeholder{color:var(--hint);}
+.cta-submit{background:var(--text);color:var(--bg);border:1px solid var(--text);padding:14px 24px;font-family:'IBM Plex Mono',monospace;font-size:10px;letter-spacing:0.08em;text-transform:uppercase;transition:all .15s;white-space:nowrap;}
+.cta-submit:hover{background:var(--accent);border-color:var(--accent);}
+.cta-note{font-family:'IBM Plex Mono',monospace;font-size:10px;color:var(--hint);letter-spacing:0.06em;}
+
+/* footer */
+footer{background:var(--text);color:rgba(245,240,232,0.5);}
+.footer-inner{max-width:1100px;margin:0 auto;padding:60px 40px 32px;}
+.footer-top{display:grid;grid-template-columns:2fr 1fr 1fr 1fr;gap:40px;margin-bottom:48px;}
+.footer-logo{font-family:'Bebas Neue',sans-serif;font-size:28px;letter-spacing:0.06em;color:var(--bg);margin-bottom:10px;}
+.footer-logo span{color:var(--accent);}
+.footer-tagline{font-family:'Instrument Serif',serif;font-style:italic;font-size:13px;color:rgba(245,240,232,0.45);line-height:1.6;margin-bottom:16px;}
+.footer-col-title{font-family:'IBM Plex Mono',monospace;font-size:9px;letter-spacing:0.12em;text-transform:uppercase;color:rgba(245,240,232,0.4);margin-bottom:14px;}
+.footer-links{list-style:none;display:flex;flex-direction:column;gap:8px;}
+.footer-links a{font-size:12px;color:rgba(245,240,232,0.45);transition:color .15s;}
+.footer-links a:hover{color:var(--bg);}
+.footer-bottom{border-top:1px solid rgba(245,240,232,0.08);padding-top:20px;display:flex;justify-content:space-between;align-items:center;flex-wrap:wrap;gap:12px;font-family:'IBM Plex Mono',monospace;font-size:10px;letter-spacing:0.04em;}
+.footer-bottom a{color:rgba(245,240,232,0.35);transition:color .15s;}
+.footer-bottom a:hover{color:var(--bg);}
+
+/* ══════════════════════════════════════════
+   AUTH MODAL
+══════════════════════════════════════════ */
+.modal-overlay{display:none;position:fixed;inset:0;z-index:400;background:rgba(26,18,8,0.75);backdrop-filter:blur(4px);align-items:center;justify-content:center;padding:20px;}
+.modal-overlay.open{display:flex;}
+.auth-card{width:100%;max-width:400px;background:var(--surface);border:1px solid var(--border);}
+.auth-logo{font-family:'Bebas Neue',sans-serif;font-size:26px;letter-spacing:0.06em;color:var(--text);padding:28px 36px 0;}
+.auth-logo span{color:var(--accent);}
+.auth-tabs{display:flex;border-bottom:1px solid var(--border);margin:16px 0 0;}
+.auth-tab{flex:1;padding:10px;font-size:11px;border:none;background:transparent;color:var(--muted);font-family:'IBM Plex Mono',monospace;letter-spacing:0.06em;text-transform:uppercase;border-bottom:2px solid transparent;margin-bottom:-1px;transition:all .15s;}
+.auth-tab.active{color:var(--accent);border-bottom-color:var(--accent);}
+.auth-body{padding:24px 36px 36px;}
+.auth-title{font-family:'Bebas Neue',sans-serif;font-size:24px;letter-spacing:0.04em;margin-bottom:2px;}
+.auth-sub{font-size:11px;color:var(--muted);margin-bottom:20px;font-family:'IBM Plex Mono',monospace;}
+.field{margin-bottom:13px;}
+.field label{display:block;font-size:10px;color:var(--muted);margin-bottom:5px;text-transform:uppercase;letter-spacing:0.08em;font-family:'IBM Plex Mono',monospace;}
+.field input,.field select{width:100%;background:var(--bg);border:1px solid var(--border);padding:10px 13px;color:var(--text);font-size:13px;font-family:'DM Sans',sans-serif;outline:none;transition:border-color .15s;}
+.field input:focus,.field select:focus{border-color:var(--accent);}
+.field input::placeholder{color:var(--hint);}
+.field select option{background:var(--surface);}
+.field-row{display:grid;grid-template-columns:1fr 1fr;gap:10px;}
+.btn-auth{width:100%;background:var(--text);color:var(--bg);border:none;padding:12px;font-size:10px;font-weight:500;font-family:'IBM Plex Mono',monospace;letter-spacing:0.1em;text-transform:uppercase;transition:background .15s;margin-top:4px;}
+.btn-auth:hover{background:var(--accent);}
+.err-box{background:var(--red-bg);border:1px solid var(--red);padding:10px 13px;font-size:11px;color:var(--red);margin-bottom:12px;display:none;font-family:'IBM Plex Mono',monospace;}
+.err-box.show{display:block;}
+.auth-footer-note{font-size:11px;color:var(--hint);text-align:center;margin-top:14px;font-family:'IBM Plex Mono',monospace;}
+.auth-footer-note a{color:var(--accent);}
+.btn-google{width:100%;background:var(--bg);color:var(--text);border:1px solid var(--border);padding:11px;font-size:11px;font-family:"IBM Plex Mono",monospace;letter-spacing:0.06em;text-transform:uppercase;transition:all .15s;display:flex;align-items:center;justify-content:center;gap:10px;margin-bottom:14px;}
+.btn-google:hover{border-color:var(--border2);background:var(--surface2);}
+.auth-divider{display:flex;align-items:center;gap:10px;margin:4px 0 14px;font-size:9px;color:var(--hint);font-family:"IBM Plex Mono",monospace;text-transform:uppercase;letter-spacing:0.08em;}
+.auth-divider::before,.auth-divider::after{content:"";flex:1;height:1px;background:var(--border);}
+.forgot-link{font-size:10px;color:var(--hint);text-align:right;margin-top:-8px;margin-bottom:12px;font-family:"IBM Plex Mono",monospace;}
+.forgot-link a{color:var(--accent);}
+.success-box{background:var(--teal-bg);border:1px solid rgba(42,122,85,0.3);padding:10px 13px;font-size:11px;color:var(--teal);margin-bottom:12px;display:none;font-family:"IBM Plex Mono",monospace;line-height:1.6;}
+.success-box.show{display:block;}
+
+/* ══════════════════════════════════════════
+   APP LAYOUT
+══════════════════════════════════════════ */
+#page-app{display:none;height:100vh;overflow:hidden;flex-direction:row;}
+#page-app.active{display:flex;}
+
+.sidebar{width:240px;min-width:240px;background:var(--surface);border-right:1px solid var(--border);display:flex;flex-direction:column;overflow:hidden;transition:width .2s;}
+.sidebar.collapsed{width:52px;min-width:52px;}
+.sidebar-header{padding:14px 16px;border-bottom:1px solid var(--border);display:flex;align-items:center;justify-content:space-between;}
+.logo-type{font-family:'Bebas Neue',sans-serif;font-size:22px;letter-spacing:0.06em;color:var(--text);}
+.logo-type span{color:var(--accent);}
+.logo-text-wrap{overflow:hidden;transition:opacity .2s,width .2s;}
+.sidebar.collapsed .logo-text-wrap{opacity:0;width:0;}
+.collapse-btn{background:none;border:none;color:var(--hint);padding:4px;transition:color .15s;flex-shrink:0;display:flex;}
+.collapse-btn:hover{color:var(--muted);}
+.sidebar.collapsed .collapse-btn svg{transform:scaleX(-1);}
+
+.sidebar-nav{flex:1;overflow-y:auto;padding:8px 0;}
+.nav-sec-lbl{font-size:9px;letter-spacing:.1em;color:var(--hint);text-transform:uppercase;padding:12px 16px 4px;white-space:nowrap;overflow:hidden;font-family:'IBM Plex Mono',monospace;}
+.sidebar.collapsed .nav-sec-lbl{opacity:0;}
+.nav-item{display:flex;align-items:center;gap:10px;padding:7px 16px;font-size:12px;color:var(--muted);border-left:2px solid transparent;transition:all .15s;white-space:nowrap;overflow:hidden;cursor:pointer;}
+.nav-item:hover{color:var(--text);background:var(--bg);}
+.nav-item.active{color:var(--accent);background:rgba(196,70,10,0.05);border-left-color:var(--accent);}
+.ni-icon{width:16px;min-width:16px;height:16px;display:flex;align-items:center;justify-content:center;flex-shrink:0;}
+.ni-label{overflow:hidden;transition:opacity .2s,width .2s;}
+.sidebar.collapsed .ni-label{opacity:0;width:0;}
+.ni-dot{width:5px;height:5px;border-radius:50%;background:var(--border);flex-shrink:0;}
+.ni-dot.done{background:var(--teal);}
+.ni-dot.current{background:var(--accent);}
+
+.sidebar-footer{padding:12px 16px;border-top:1px solid var(--border);}
+.user-row{display:flex;align-items:center;gap:8px;cursor:pointer;padding:6px;transition:background .15s;overflow:hidden;}
+.user-row:hover{background:var(--bg);}
+.user-av{width:30px;min-width:30px;height:30px;background:var(--text);display:flex;align-items:center;justify-content:center;font-size:11px;font-weight:500;color:var(--bg);font-family:'IBM Plex Mono',monospace;flex-shrink:0;}
+.user-info{overflow:hidden;}
+.user-name-text{font-size:12px;font-weight:500;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;}
+.user-curso-text{font-size:10px;color:var(--muted);white-space:nowrap;overflow:hidden;text-overflow:ellipsis;font-family:'IBM Plex Mono',monospace;}
+.sidebar.collapsed .user-info{display:none;}
+.prog-wrap{margin-top:10px;overflow:hidden;}
+.sidebar.collapsed .prog-wrap{display:none;}
+.prog-label{display:flex;justify-content:space-between;font-size:9px;color:var(--hint);margin-bottom:4px;font-family:'IBM Plex Mono',monospace;text-transform:uppercase;letter-spacing:0.06em;}
+.prog-bar{background:var(--surface2);height:2px;}
+.prog-fill{height:100%;background:var(--accent);width:0%;transition:width .4s;}
+
+/* main */
+.main{flex:1;display:flex;flex-direction:column;overflow:hidden;}
+.topbar{height:50px;min-height:50px;background:var(--surface);border-bottom:1px solid var(--border);display:flex;align-items:center;padding:0 20px;justify-content:space-between;}
+.tab-nav{display:flex;gap:0;}
+.tab-btn{padding:6px 16px;font-size:10px;border:none;background:transparent;color:var(--muted);transition:all .15s;font-family:'IBM Plex Mono',monospace;letter-spacing:0.06em;text-transform:uppercase;border-bottom:2px solid transparent;}
+.tab-btn:hover{color:var(--text);}
+.tab-btn.active{color:var(--accent);border-bottom-color:var(--accent);}
+.topbar-right{display:flex;align-items:center;gap:8px;}
+.pill{font-size:10px;padding:3px 10px;border:1px solid var(--border);color:var(--muted);font-family:'IBM Plex Mono',monospace;}
+.pill.accent{border-color:var(--accent);color:var(--accent);background:rgba(196,70,10,0.05);}
+.icon-btn{background:none;border:1px solid var(--border);padding:6px 8px;color:var(--muted);transition:all .15s;display:flex;align-items:center;}
+.icon-btn:hover{border-color:var(--border2);color:var(--text);}
+
+.content{flex:1;overflow-y:auto;padding:24px 28px;}
+.view{display:none;}
+.view.active{display:block;animation:fadeUpApp .2s ease;}
+@keyframes fadeUpApp{from{opacity:0;transform:translateY(4px);}to{opacity:1;transform:translateY(0);}}
+
+/* ══════════════════════════════════════════
+   APP — HOME VIEW
+══════════════════════════════════════════ */
+.home-view{display:flex;flex-direction:column;align-items:center;justify-content:center;min-height:calc(100dvh - 50px);position:relative;overflow:hidden;margin:-24px -28px;}
+.home-bg-lines{position:absolute;inset:0;pointer-events:none;opacity:0.04;background-image:repeating-linear-gradient(0deg,transparent,transparent 39px,var(--text) 39px,var(--text) 40px),repeating-linear-gradient(90deg,transparent,transparent 39px,var(--text) 39px,var(--text) 40px);}
+.home-sulcus-wrap{position:relative;text-align:center;display:flex;flex-direction:column;align-items:center;}
+@keyframes sulcusAppear{from{opacity:0;transform:translateY(16px);}to{opacity:1;transform:translateY(0);}}
+@keyframes sulcusFloat{0%,100%{transform:perspective(600px) rotateY(0deg) translateY(0px);}25%{transform:perspective(600px) rotateY(8deg) translateY(-8px);}50%{transform:perspective(600px) rotateY(0deg) translateY(-14px);}75%{transform:perspective(600px) rotateY(-8deg) translateY(-8px);}}
+.home-sulcus-3d-wrap{display:inline-block;filter:drop-shadow(0 20px 40px rgba(196,70,10,0.12)) drop-shadow(0 4px 12px rgba(26,18,8,0.08));opacity:0;animation:sulcusAppear .8s ease forwards,sulcusFloat 7s 1s ease-in-out infinite;}
+.home-sulcus{font-family:'Bebas Neue',sans-serif;font-size:clamp(80px,14vw,160px);letter-spacing:0.06em;line-height:1;color:var(--text);}
+.home-sulcus span{color:var(--accent);}
+.home-sulcus-underline{height:2px;background:linear-gradient(90deg,transparent,var(--accent),transparent);margin-top:4px;animation:underlinePulse 4s ease-in-out infinite;}
+@keyframes underlinePulse{0%,100%{opacity:0.3;width:60%;}50%{opacity:0.7;width:85%;}}
+.home-tagline{font-family:'Instrument Serif',serif;font-style:italic;font-size:16px;color:var(--muted);margin-top:24px;max-width:400px;line-height:1.6;opacity:0;animation:sulcusAppear .6s .4s ease forwards;}
+
+/* ══════════════════════════════════════════
+   APP — CARDS & COMPONENTS
+══════════════════════════════════════════ */
+.card{background:var(--surface);border:1px solid var(--border);padding:24px;margin-bottom:14px;}
+.tag{display:inline-flex;align-items:center;gap:5px;font-size:9px;padding:3px 8px;font-weight:500;margin-bottom:14px;letter-spacing:.08em;text-transform:uppercase;font-family:'IBM Plex Mono',monospace;}
+.tag-accent{background:rgba(196,70,10,0.08);color:var(--accent);border:1px solid rgba(196,70,10,0.2);}
+.tag-teal{background:var(--teal-bg);color:var(--teal);border:1px solid rgba(42,122,85,0.2);}
+.tag-amber{background:var(--amber-bg);color:var(--amber);border:1px solid rgba(138,96,0,0.2);}
+.card-title{font-family:'Bebas Neue',sans-serif;font-size:26px;letter-spacing:0.04em;color:var(--text);margin-bottom:4px;}
+.card-sub{font-size:12px;color:var(--muted);margin-bottom:16px;font-family:'Instrument Serif',serif;font-style:italic;}
+.body-text{font-size:13px;color:var(--muted);line-height:1.8;}
+.body-text p{margin-bottom:12px;}
+.hl{background:rgba(196,70,10,0.1);color:var(--accent);padding:1px 4px;font-weight:500;}
+.hl-teal{background:var(--teal-bg);color:var(--teal);padding:1px 4px;font-weight:500;}
+.hl-amber{background:var(--amber-bg);color:var(--amber);padding:1px 4px;font-weight:500;}
+.concepts-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:8px;margin:14px 0;}
+.concept-card{background:var(--bg);border:1px solid var(--border);padding:12px;}
+.concept-title{font-size:10px;font-weight:500;color:var(--accent);margin-bottom:3px;text-transform:uppercase;letter-spacing:0.06em;font-family:'IBM Plex Mono',monospace;}
+.concept-body{font-size:11px;color:var(--muted);line-height:1.5;}
+.divider{border:none;border-top:1px solid var(--border);margin:18px 0;}
+.btn-row{display:flex;gap:8px;justify-content:flex-end;}
+.btn-primary-app{background:var(--text);color:var(--bg);border:none;padding:9px 20px;font-size:10px;font-weight:500;font-family:'IBM Plex Mono',monospace;letter-spacing:0.08em;text-transform:uppercase;transition:background .15s;}
+.btn-primary-app:hover{background:var(--accent);}
+.btn-ghost-app{background:transparent;color:var(--muted);border:1px solid var(--border);padding:9px 20px;font-size:10px;font-family:'IBM Plex Mono',monospace;letter-spacing:0.06em;text-transform:uppercase;transition:all .15s;}
+.btn-ghost-app:hover{color:var(--text);border-color:var(--border2);}
+
+/* ai box */
+.ai-box{background:var(--bg);border:1px solid var(--border);padding:14px;margin:14px 0;}
+.ai-box-header{font-size:9px;color:var(--muted);margin-bottom:8px;text-transform:uppercase;letter-spacing:0.1em;font-family:'IBM Plex Mono',monospace;}
+.ai-input-row{display:flex;gap:8px;}
+.ai-input{flex:1;background:var(--surface);border:1px solid var(--border);padding:8px 12px;color:var(--text);font-size:13px;font-family:'DM Sans',sans-serif;outline:none;transition:border-color .15s;}
+.ai-input:focus{border-color:var(--accent);}
+.ai-input::placeholder{color:var(--hint);}
+.ai-btn{background:var(--text);color:var(--bg);border:none;padding:8px 16px;font-size:10px;font-family:'IBM Plex Mono',monospace;font-weight:500;white-space:nowrap;letter-spacing:0.06em;text-transform:uppercase;transition:background .15s;}
+.ai-btn:hover{background:var(--accent);}
+.ai-btn:disabled{opacity:.5;cursor:not-allowed;}
+.ai-resp{margin-top:10px;font-size:13px;color:var(--muted);line-height:1.7;display:none;font-family:'Instrument Serif',serif;}
+.ai-resp.show{display:block;animation:fadeUpApp .3s ease;}
+.thinking{display:none;align-items:center;gap:5px;margin-top:10px;font-size:11px;color:var(--muted);font-family:'IBM Plex Mono',monospace;}
+.thinking.show{display:flex;}
+.da{width:4px;height:4px;border-radius:50%;background:var(--accent);animation:daPulse 1s infinite;}
+.da:nth-child(2){animation-delay:.2s;}.da:nth-child(3){animation-delay:.4s;}
+@keyframes daPulse{0%,100%{opacity:.3;}50%{opacity:1;}}
+
+/* mindmap */
+.mm-wrap{overflow:hidden;background:var(--bg);border:1px solid var(--border);position:relative;user-select:none;cursor:grab;height:340px;}
+.mm-wrap:active{cursor:grabbing;}
+#mm-svg{width:100%;height:100%;}
+.mm-node{cursor:pointer;}
+.mm-node rect,.mm-node ellipse{transition:filter .2s;}
+.mm-node:hover rect,.mm-node:hover ellipse{filter:brightness(0.92);}
+.mm-controls{position:absolute;bottom:10px;right:10px;display:flex;gap:4px;}
+.mm-ctrl-btn{background:var(--surface);border:1px solid var(--border);color:var(--muted);padding:4px 9px;font-size:12px;font-family:'IBM Plex Mono',monospace;transition:all .15s;}
+.mm-ctrl-btn:hover{color:var(--text);border-color:var(--border2);}
+.mm-resp{margin-top:12px;padding:14px;background:var(--bg);border:1px solid var(--border);font-size:13px;line-height:1.7;color:var(--muted);display:none;font-family:'Instrument Serif',serif;font-style:italic;}
+.mm-resp.show{display:block;animation:fadeUpApp .3s ease;}
+.mm-tip{font-size:10px;color:var(--hint);margin-bottom:8px;font-family:'IBM Plex Mono',monospace;}
+
+/* flashcards */
+.fc-hdr{display:flex;align-items:center;justify-content:space-between;margin-bottom:14px;}
+.fc-ctr{font-size:10px;color:var(--muted);font-family:'IBM Plex Mono',monospace;}
+.fc-dots{display:flex;gap:3px;}
+.fc-dot{width:16px;height:2px;background:var(--border);transition:background .2s;}
+.fc-dot.active{background:var(--accent);}
+.fc-dot.done{background:var(--teal);}
+.flashcard{background:var(--bg);border:1px solid var(--border);padding:36px 24px;text-align:center;min-height:170px;display:flex;flex-direction:column;align-items:center;justify-content:center;cursor:pointer;transition:border-color .25s;margin-bottom:14px;}
+.flashcard:hover{border-color:var(--accent);}
+.fc-lbl{font-size:9px;letter-spacing:.1em;color:var(--hint);text-transform:uppercase;margin-bottom:14px;font-family:'IBM Plex Mono',monospace;}
+.fc-q{font-family:'Instrument Serif',serif;font-size:20px;color:var(--text);line-height:1.4;margin-bottom:8px;}
+.fc-hint{font-size:10px;color:var(--hint);font-family:'IBM Plex Mono',monospace;}
+.fc-a{font-size:14px;color:var(--muted);line-height:1.7;font-family:'Instrument Serif',serif;}
+.rating-row{display:flex;gap:8px;justify-content:center;flex-wrap:wrap;}
+.r-btn{padding:7px 18px;font-size:10px;font-family:'IBM Plex Mono',monospace;transition:all .15s;font-weight:500;letter-spacing:0.06em;text-transform:uppercase;}
+.r-hard{background:var(--red-bg);border:1px solid rgba(163,32,32,0.3);color:var(--red);}
+.r-hard:hover{background:rgba(163,32,32,0.15);}
+.r-med{background:var(--amber-bg);border:1px solid rgba(138,96,0,0.3);color:var(--amber);}
+.r-med:hover{background:rgba(138,96,0,0.15);}
+.r-easy{background:var(--teal-bg);border:1px solid rgba(42,122,85,0.3);color:var(--teal);}
+.r-easy:hover{background:rgba(42,122,85,0.15);}
+.fc-nav{display:flex;justify-content:space-between;margin-top:12px;}
+
+/* progresso */
+.stats-grid{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:10px;margin-bottom:18px;}
+.stat-card{background:var(--bg);padding:16px;border:1px solid var(--border);}
+.stat-val{font-family:'Bebas Neue',sans-serif;font-size:32px;letter-spacing:0.04em;color:var(--text);}
+.stat-lbl{font-size:9px;color:var(--muted);margin-top:2px;text-transform:uppercase;letter-spacing:0.08em;font-family:'IBM Plex Mono',monospace;}
+.topic-row{display:flex;align-items:center;gap:10px;margin-bottom:12px;font-size:12px;}
+.topic-name{flex:1;color:var(--text);}
+.topic-pct{width:32px;text-align:right;color:var(--muted);font-size:10px;font-family:'IBM Plex Mono',monospace;}
+.topic-bar{flex:2;background:var(--surface2);height:2px;}
+.topic-fill{height:100%;transition:width .5s;}
+.next-rev{background:var(--teal-bg);border:1px solid rgba(42,122,85,0.2);padding:12px 16px;font-size:12px;color:var(--teal);margin-top:14px;display:flex;align-items:center;gap:8px;font-family:'IBM Plex Mono',monospace;}
+.rev-dot{width:6px;height:6px;background:var(--teal);flex-shrink:0;}
+
+/* admin */
+.admin-grid{display:grid;grid-template-columns:1fr 1fr;gap:12px;margin-bottom:20px;}
+.admin-card{background:var(--bg);border:1px solid var(--border);padding:16px;cursor:pointer;transition:border-color .2s;}
+.admin-card:hover{border-color:var(--border2);}
+.admin-card-icon{width:36px;height:36px;display:flex;align-items:center;justify-content:center;margin-bottom:10px;}
+.admin-card-title{font-size:13px;font-weight:500;margin-bottom:4px;}
+.admin-card-sub{font-size:10px;color:var(--muted);font-family:'IBM Plex Mono',monospace;}
+.form-section{margin-bottom:20px;}
+.form-section-title{font-size:11px;font-weight:500;color:var(--text);margin-bottom:12px;display:flex;align-items:center;gap:8px;text-transform:uppercase;letter-spacing:0.08em;font-family:'IBM Plex Mono',monospace;}
+.form-field{margin-bottom:12px;}
+.form-field label{display:block;font-size:10px;color:var(--muted);margin-bottom:5px;text-transform:uppercase;letter-spacing:0.06em;font-family:'IBM Plex Mono',monospace;}
+.form-field input,.form-field select,.form-field textarea{width:100%;background:var(--bg);border:1px solid var(--border);padding:9px 12px;color:var(--text);font-size:13px;font-family:'DM Sans',sans-serif;outline:none;transition:border-color .15s;resize:vertical;}
+.form-field input:focus,.form-field select:focus,.form-field textarea:focus{border-color:var(--accent);}
+.form-field input::placeholder,.form-field textarea::placeholder{color:var(--hint);}
+.fc-admin-list{display:flex;flex-direction:column;gap:8px;margin-bottom:14px;max-height:300px;overflow-y:auto;}
+.fc-admin-item{background:var(--bg);border:1px solid var(--border);padding:12px;display:flex;align-items:flex-start;justify-content:space-between;gap:12px;}
+.fc-admin-item-content{flex:1;min-width:0;}
+.fc-admin-q{font-size:12px;font-weight:500;color:var(--text);margin-bottom:3px;}
+.fc-admin-a{font-size:11px;color:var(--muted);line-height:1.4;font-family:'Instrument Serif',serif;font-style:italic;}
+.fc-admin-del{background:none;border:none;color:var(--hint);padding:2px;transition:color .15s;flex-shrink:0;}
+.fc-admin-del:hover{color:var(--red);}
+.add-fc-row{display:grid;grid-template-columns:1fr 1fr;gap:8px;margin-bottom:8px;}
+.success-msg{background:var(--teal-bg);border:1px solid rgba(42,122,85,0.25);padding:10px 13px;font-size:11px;color:var(--teal);margin-bottom:12px;display:none;font-family:'IBM Plex Mono',monospace;}
+.success-msg.show{display:block;}
+
+/* perfil */
+.profile-header{display:flex;align-items:center;gap:20px;margin-bottom:24px;}
+.profile-av-big{width:64px;height:64px;background:var(--text);display:flex;align-items:center;justify-content:center;font-size:22px;font-weight:500;color:var(--bg);font-family:'IBM Plex Mono',monospace;}
+.profile-name-big{font-family:'Bebas Neue',sans-serif;font-size:26px;letter-spacing:0.04em;}
+.profile-role{font-size:12px;color:var(--muted);font-family:'IBM Plex Mono',monospace;}
+.profile-sections{display:grid;grid-template-columns:1fr 1fr;gap:14px;}
+.profile-section{background:var(--bg);border:1px solid var(--border);padding:18px;}
+.profile-section-title{font-size:9px;font-weight:500;color:var(--muted);margin-bottom:14px;text-transform:uppercase;letter-spacing:.1em;font-family:'IBM Plex Mono',monospace;}
+.profile-row{display:flex;justify-content:space-between;align-items:center;padding:8px 0;border-bottom:1px solid var(--border);font-size:12px;}
+.profile-row:last-child{border-bottom:none;}
+.profile-key{color:var(--muted);}
+.profile-val{color:var(--text);font-weight:500;}
+.badge-plan{display:inline-block;background:rgba(196,70,10,0.08);color:var(--accent);border:1px solid rgba(196,70,10,0.2);padding:2px 10px;font-size:9px;font-family:'IBM Plex Mono',monospace;text-transform:uppercase;letter-spacing:0.06em;}
+
+/* welcome banner */
+.welcome-banner{background:rgba(196,70,10,0.04);border:1px solid rgba(196,70,10,0.15);padding:12px 16px;margin-bottom:16px;font-size:13px;color:var(--muted);display:flex;align-items:center;gap:10px;font-family:'Instrument Serif',serif;font-style:italic;}
+.welcome-banner strong{color:var(--text);font-style:normal;}
+.welcome-banner-icon{flex-shrink:0;color:var(--accent);}
+
+/* toast */
+.toast{position:fixed;bottom:24px;right:24px;background:var(--text);padding:12px 18px;font-size:11px;color:var(--bg);z-index:1000;transform:translateY(60px);opacity:0;transition:all .3s;pointer-events:none;font-family:'IBM Plex Mono',monospace;letter-spacing:0.04em;}
+.toast.show{transform:translateY(0);opacity:1;}
+.toast.success{background:var(--teal);}
+
+/* onboarding */
+.ob-card{width:100%;max-width:520px;background:var(--surface);border:1px solid var(--border);padding:40px;}
+.ob-dots{display:flex;gap:6px;justify-content:center;margin-bottom:32px;}
+.ob-dot{width:24px;height:3px;background:var(--border);transition:all .2s;}
+.ob-dot.active{background:var(--accent);width:36px;}
+.ob-dot.done{background:var(--teal);}
+.ob-title{font-family:'Bebas Neue',sans-serif;font-size:30px;letter-spacing:0.04em;margin-bottom:6px;text-align:center;}
+.ob-sub{font-size:13px;color:var(--muted);text-align:center;margin-bottom:28px;line-height:1.6;font-family:'Instrument Serif',serif;font-style:italic;}
+.ob-options{display:grid;grid-template-columns:1fr 1fr;gap:8px;margin-bottom:24px;}
+.ob-option{background:var(--bg);border:1px solid var(--border);padding:14px;cursor:pointer;transition:all .15s;text-align:left;}
+.ob-option:hover{border-color:var(--border2);}
+.ob-option.sel{border-color:var(--accent);border-width:2px;background:var(--surface);}
+.ob-option-title{font-size:13px;font-weight:500;margin-bottom:2px;}
+.ob-option-sub{font-size:10px;color:var(--muted);font-family:'IBM Plex Mono',monospace;}
+.ob-nav{display:flex;gap:10px;justify-content:space-between;}
+.btn-ob-next{flex:1;background:var(--text);color:var(--bg);border:none;padding:11px;font-size:10px;font-family:'IBM Plex Mono',monospace;letter-spacing:0.08em;text-transform:uppercase;transition:background .15s;}
+.btn-ob-next:hover{background:var(--accent);}
+.btn-ob-back{background:transparent;color:var(--muted);border:1px solid var(--border);padding:11px 18px;font-size:10px;font-family:'IBM Plex Mono',monospace;letter-spacing:0.06em;text-transform:uppercase;transition:all .15s;}
+.btn-ob-back:hover{color:var(--text);border-color:var(--border2);}
+
+/* mobile sidebar overlay */
+.sidebar-overlay{display:none;position:fixed;inset:0;background:rgba(26,18,8,0.5);z-index:50;}
+.sidebar-overlay.open{display:block;}
+
+/* responsive */
+@media(max-width:768px){
+  .l-nav{padding:0 20px;}
+  .nav-links{display:none;}
+  .about-inner,.curriculum-inner{grid-template-columns:1fr;}
+  .features-grid{grid-template-columns:1fr;}
+  .steps{grid-template-columns:1fr 1fr;}
+  .testimonials{grid-template-columns:1fr;}
+  .footer-top{grid-template-columns:1fr 1fr;}
+  .hero-stats{flex-wrap:wrap;}
+  .hero-stat{flex:1;min-width:120px;}
+}
+@media(max-width:640px){
+  .content{padding:16px;}
+  .stats-grid,.concepts-grid,.profile-sections{grid-template-columns:1fr;}
+  .sidebar{position:fixed;left:-240px;height:100%;z-index:60;transition:left .25s;}
+  .sidebar.mobile-open{left:0;}
+}
+</style>
+</head>
+<body>
+
+<!-- ══════════════════════════════════════════
+     LANDING PAGE
+══════════════════════════════════════════ -->
+<div id="page-landing" class="page active">
+
+  <nav class="l-nav" id="main-nav">
+    <a class="nav-logo" href="#">SUL<span>C</span>US</a>
+    <ul class="nav-links">
+      <li><a href="#features">Funcionalidades</a></li>
+      <li><a href="#curriculum">Currículo</a></li>
+      <li><a href="#testimonials">Testemunhos</a></li>
+    </ul>
+    <div class="nav-cta-group">
+      <a class="btn-nav-ghost" href="#" onclick="openAuth('login');return false;">Entrar</a>
+      <a class="btn-nav-primary" href="#" onclick="openAuth('register');return false;">Criar conta</a>
+    </div>
+  </nav>
+
+  <!-- Hero -->
+  <section class="hero">
+    <div class="hero-grid"></div>
+    <div class="hero-ring hero-ring-1"></div>
+    <div class="hero-ring hero-ring-2"></div>
+    <div class="hero-ring hero-ring-3"></div>
+    <div class="hero-corner tl"></div>
+    <div class="hero-corner tr"></div>
+    <div class="hero-corner bl"></div>
+    <div class="hero-corner br"></div>
+
+    <div class="hero-eyebrow">Plataforma de medicina · Jean Piaget de Angola</div>
+    <div class="hero-wordmark">
+      <span class="hero-title">SUL<span class="c">C</span>US</span>
+      <div class="hero-underline"></div>
+    </div>
+    <p class="hero-tagline">
+      Aprendizagem que deixa marca.<br>
+      <strong>Resumos, flashcards e IA</strong> mapeados para o teu currículo médico.
+    </p>
+    <div class="hero-actions">
+      <a class="btn-lg btn-lg-primary" href="#" onclick="openAuth('register');return false;">Começar gratuitamente →</a>
+      <a class="btn-lg btn-lg-ghost" href="#features">Ver funcionalidades</a>
+    </div>
+    <div class="hero-stats">
+      <div class="hero-stat"><span class="hero-stat-val">2<span>400</span>+</span><span class="hero-stat-lbl">Estudantes ativos</span></div>
+      <div class="hero-stat"><span class="hero-stat-val">14</span><span class="hero-stat-lbl">Disciplinas</span></div>
+      <div class="hero-stat"><span class="hero-stat-val">94<span>%</span></span><span class="hero-stat-lbl">Taxa de aprovação</span></div>
+      <div class="hero-stat"><span class="hero-stat-val">4.<span>9</span>★</span><span class="hero-stat-lbl">Avaliação média</span></div>
+    </div>
+    <div class="scroll-cue">
+      <span>Explorar</span>
+      <div class="scroll-line"></div>
+    </div>
+  </section>
+
+  <!-- About -->
+  <section class="about" id="about">
+    <div class="about-inner">
+      <div class="reveal">
+        <div class="section-label">O que é o SULCUS</div>
+        <h2 class="section-title">Uma nova forma<br>de estudar medicina.</h2>
+        <p class="section-sub">Construído especificamente para estudantes da Universidade Jean Piaget de Angola.</p>
+        <div class="about-text">
+          <p>O SULCUS combina <strong>resumos gerados por IA</strong>, mapas mentais interativos, flashcards com revisão espaçada e um assistente clínico sempre disponível.</p>
+          <p>Cada conteúdo foi desenhado para o currículo angolano — não é genérico. É medicina como a estudas.</p>
+        </div>
+      </div>
+      <div class="about-definition reveal reveal-delay-1">
+        <div class="def-word">SUL<span>C</span>US</div>
+        <div class="def-phonetic">/ ˈsʌl.kəs /</div>
+        <div class="def-type">substantivo · anatomia</div>
+        <div class="def-meaning">Sulco ou fissura na superfície do cérebro, separando os giros cerebrais. Cada sulco aumenta a área cortical disponível para processamento.</div>
+        <div class="def-anatomy">// Plural: sulci · Do latim <em>sulcus</em> (sulco, ranhura) · Estrutura que define a inteligência pela superfície, não pelo volume.</div>
+      </div>
+    </div>
+  </section>
+
+  <!-- Features -->
+  <section class="features" id="features">
+    <div class="features-inner">
+      <div class="features-header">
+        <div class="reveal">
+          <div class="section-label">Funcionalidades</div>
+          <h2 class="section-title">Tudo o que<br>precisas.</h2>
+        </div>
+        <p class="section-sub reveal reveal-delay-1">Ferramentas construídas para a forma como os estudantes de medicina realmente estudam.</p>
+      </div>
+      <div class="features-grid">
+        <div class="feature-card reveal">
+          <div class="feature-icon">📚</div>
+          <div class="feature-num">// 01</div>
+          <div class="feature-name">Resumos IA</div>
+          <div class="feature-desc">Conteúdo estruturado por disciplina, com conceitos-chave, exemplos clínicos e ligações ao Guyton & Hall.</div>
+          <span class="feature-tag accent">Disponível</span>
+        </div>
+        <div class="feature-card reveal reveal-delay-1">
+          <div class="feature-icon">🃏</div>
+          <div class="feature-num">// 02</div>
+          <div class="feature-name">Flashcards</div>
+          <div class="feature-desc">Revisão espaçada que adapta a frequência com base no teu desempenho real. Aprende mais, esquece menos.</div>
+          <span class="feature-tag teal">Revisão espaçada</span>
+        </div>
+        <div class="feature-card reveal reveal-delay-2">
+          <div class="feature-icon">🧠</div>
+          <div class="feature-num">// 03</div>
+          <div class="feature-name">Mapa Mental</div>
+          <div class="feature-desc">Visualiza as conexões entre diagnóstico, fisiopatologia e tratamento num só mapa interativo e clicável.</div>
+          <span class="feature-tag amber">Interativo</span>
+        </div>
+        <div class="feature-card reveal">
+          <div class="feature-icon">🤖</div>
+          <div class="feature-num">// 04</div>
+          <div class="feature-name">Professor IA</div>
+          <div class="feature-desc">Faz qualquer pergunta sobre a matéria. Recebe respostas detalhadas, como se tivesses um tutor disponível 24h.</div>
+          <span class="feature-tag accent">Tempo real</span>
+        </div>
+        <div class="feature-card reveal reveal-delay-1">
+          <div class="feature-icon">📊</div>
+          <div class="feature-num">// 05</div>
+          <div class="feature-name">Progresso</div>
+          <div class="feature-desc">Acompanha o teu desempenho por disciplina, identifica lacunas e otimiza o tempo que investes a estudar.</div>
+          <span class="feature-tag teal">Analytics</span>
+        </div>
+        <div class="feature-card reveal reveal-delay-2">
+          <div class="feature-icon">🎯</div>
+          <div class="feature-num">// 06</div>
+          <div class="feature-name">Currículo local</div>
+          <div class="feature-desc">Conteúdo mapeado especificamente para o currículo de medicina da Universidade Jean Piaget de Angola.</div>
+          <span class="feature-tag amber">Angola</span>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- How it works -->
+  <section class="how">
+    <div class="how-inner">
+      <div class="how-header reveal">
+        <div class="section-label">Como funciona</div>
+        <h2 class="section-title">4 passos.<br>Resultados reais.</h2>
+      </div>
+      <div class="steps">
+        <div class="step reveal">
+          <div class="step-num">01</div>
+          <div class="step-title">Crias conta</div>
+          <div class="step-desc">Regista-te gratuitamente. Sem cartão de crédito, sem compromissos.</div>
+        </div>
+        <div class="step reveal reveal-delay-1">
+          <div class="step-num">02</div>
+          <div class="step-title">Escolhes disciplina</div>
+          <div class="step-desc">Seleciona a disciplina que estás a estudar no teu ano curricular.</div>
+        </div>
+        <div class="step reveal reveal-delay-2">
+          <div class="step-num">03</div>
+          <div class="step-title">Estudas</div>
+          <div class="step-desc">Lê o resumo, explora o mapa mental, faz flashcards, pergunta à IA.</div>
+        </div>
+        <div class="step reveal">
+          <div class="step-num">04</div>
+          <div class="step-title">Passas</div>
+          <div class="step-desc">O teu progresso é monitorizado para que nunca entres num exame sem preparação.</div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- Testimonials -->
+  <section class="social" id="testimonials">
+    <div class="social-inner">
+      <div class="social-header">
+        <div>
+          <div class="section-label reveal">Testemunhos</div>
+          <h2 class="section-title reveal">O que dizem<br>os estudantes.</h2>
+        </div>
+      </div>
+      <div class="testimonials">
+        <div class="testimonial reveal">
+          <div class="t-stars"><span class="star">★</span><span class="star">★</span><span class="star">★</span><span class="star">★</span><span class="star">★</span></div>
+          <p class="t-quote">Os resumos são o que precisava — claros, com exemplos clínicos e sem o excesso dos livros. Finalmente estudar faz sentido.</p>
+          <div class="t-author">
+            <div class="t-av">AM</div>
+            <div><div class="t-name">Ana M.</div><div class="t-role">// Medicina — 4.º Ano · Jean Piaget</div></div>
+          </div>
+        </div>
+        <div class="testimonial reveal reveal-delay-1">
+          <div class="t-stars"><span class="star">★</span><span class="star">★</span><span class="star">★</span><span class="star">★</span><span class="star">★</span></div>
+          <p class="t-quote">O Professor IA é incrível. Consigo perguntar qualquer coisa sobre fisiopatologia e recebo respostas melhores do que nas aulas.</p>
+          <div class="t-author">
+            <div class="t-av">KN</div>
+            <div><div class="t-name">Kátia N.</div><div class="t-role">// Medicina — 2.º Ano · Jean Piaget</div></div>
+          </div>
+        </div>
+        <div class="testimonial reveal reveal-delay-2">
+          <div class="t-stars"><span class="star">★</span><span class="star">★</span><span class="star">★</span><span class="star">★</span><span class="star">★</span></div>
+          <p class="t-quote">Os flashcards com revisão espaçada fizeram a diferença na preparação para os exames de Histologia. Poupei horas e retive muito mais.</p>
+          <div class="t-author">
+            <div class="t-av">BL</div>
+            <div><div class="t-name">Bruno L.</div><div class="t-role">// Medicina — 1.º Ano · Jean Piaget</div></div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- Curriculum -->
+  <section class="curriculum" id="curriculum">
+    <div class="curriculum-inner">
+      <div class="reveal">
+        <div class="section-label">Currículo</div>
+        <h2 class="section-title" style="color:var(--bg)">6 anos.<br>14 disciplinas.<br>1 plataforma.</h2>
+        <p class="section-sub">Conteúdo mapeado para o currículo de medicina da Universidade Jean Piaget de Angola, do Ciclo Básico ao Ciclo Clínico.</p>
+        <div class="curriculum-note">
+          <strong>Ciclo Básico</strong> — disponível agora<br>
+          <strong>Ciclo Clínico</strong> — em desenvolvimento<br><br>
+          Novos conteúdos adicionados regularmente por professores e tutores parceiros.
+        </div>
+      </div>
+      <div class="reveal reveal-delay-1">
+        <div class="year-block">
+          <div class="year-header open" onclick="toggleYear(this)">
+            <div><div class="year-name">Ciclo Básico — 1.º Ano</div></div>
+            <div style="display:flex;align-items:center;gap:12px;"><span class="year-count">5 disciplinas</span><span class="year-arrow">›</span></div>
+          </div>
+          <div class="year-items open">
+            <div class="year-item"><div style="display:flex;align-items:center;"><div class="yi-dot done"></div>Filosofia</div><span class="yi-badge">Disponível</span></div>
+            <div class="year-item"><div style="display:flex;align-items:center;"><div class="yi-dot done"></div>Bioquímica</div><span class="yi-badge">Disponível</span></div>
+            <div class="year-item"><div style="display:flex;align-items:center;"><div class="yi-dot done"></div>Biomedicina</div><span class="yi-badge">Disponível</span></div>
+            <div class="year-item"><div style="display:flex;align-items:center;"><div class="yi-dot done"></div>Anatomia Locomotora</div><span class="yi-badge">Disponível</span></div>
+            <div class="year-item"><div style="display:flex;align-items:center;"><div class="yi-dot done"></div>Histologia Geral</div><span class="yi-badge">Disponível</span></div>
+          </div>
+        </div>
+        <div class="year-block">
+          <div class="year-header" onclick="toggleYear(this)">
+            <div><div class="year-name">Ciclo Básico — 2.º Ano</div></div>
+            <div style="display:flex;align-items:center;gap:12px;"><span class="year-count">5 disciplinas</span><span class="year-arrow">›</span></div>
+          </div>
+          <div class="year-items">
+            <div class="year-item"><div style="display:flex;align-items:center;"><div class="yi-dot done"></div>Histologia Especial</div><span class="yi-badge">Disponível</span></div>
+            <div class="year-item"><div style="display:flex;align-items:center;"><div class="yi-dot done"></div>Fisiologia Geral</div><span class="yi-badge">Disponível</span></div>
+            <div class="year-item"><div style="display:flex;align-items:center;"><div class="yi-dot current"></div>Neuroanatomia</div><span class="yi-badge">Disponível</span></div>
+            <div class="year-item"><div style="display:flex;align-items:center;"><div class="yi-dot"></div>Embriologia Especial</div><span class="yi-badge">Disponível</span></div>
+            <div class="year-item"><div style="display:flex;align-items:center;"><div class="yi-dot"></div>Anatomia Esplâncnica</div><span class="yi-badge">Disponível</span></div>
+          </div>
+        </div>
+        <div class="year-block">
+          <div class="year-header" onclick="toggleYear(this)">
+            <div><div class="year-name">Ciclo Clínico — 3.º ao 6.º Ano</div></div>
+            <div style="display:flex;align-items:center;gap:12px;"><span class="year-count">Em breve</span><span class="year-arrow">›</span></div>
+          </div>
+          <div class="year-items">
+            <div class="year-item" style="opacity:.5;font-style:italic;justify-content:center;color:rgba(245,240,232,0.4);font-family:'Instrument Serif',serif;">Cardiologia, Neurologia, Medicina Interna e mais — em desenvolvimento.</div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- CTA Final -->
+  <section class="cta-final" id="comecar">
+    <div class="cta-grid"></div>
+    <div class="reveal" style="position:relative;z-index:1;">
+      <span class="cta-eyebrow">Começa hoje</span>
+      <h2 class="cta-title">Estuda como<br>o teu <span>cérebro</span><br>foi feito.</h2>
+      <p class="cta-sub">Grátis para começar. Sem cartão de crédito. Sem distrações.</p>
+      <div class="cta-input-row">
+        <input class="cta-input" type="email" placeholder="o.teu@email.com" id="cta-email">
+        <button class="cta-submit" onclick="ctaSubmit()">Entrar gratuitamente →</button>
+      </div>
+      <p class="cta-note">Junta-te a centenas de estudantes de medicina</p>
+    </div>
+  </section>
+
+  <!-- Footer -->
+  <footer>
+    <div class="footer-inner">
+      <div class="footer-top">
+        <div>
+          <div class="footer-logo">SUL<span>C</span>US</div>
+          <p class="footer-tagline">Aprendizagem que deixa marca.<br>Construído para estudantes de medicina angolanos.</p>
+          <div style="font-family:'IBM Plex Mono',monospace;font-size:9px;color:rgba(245,240,232,0.25);letter-spacing:0.06em;text-transform:uppercase;">// Aprendizagem que deixa marca</div>
+        </div>
+        <div>
+          <div class="footer-col-title">Plataforma</div>
+          <ul class="footer-links">
+            <li><a href="#">Resumos</a></li>
+            <li><a href="#">Mapas Mentais</a></li>
+            <li><a href="#">Flashcards</a></li>
+            <li><a href="#">Professor IA</a></li>
+          </ul>
+        </div>
+        <div>
+          <div class="footer-col-title">Currículo</div>
+          <ul class="footer-links">
+            <li><a href="#">1.º Ano</a></li>
+            <li><a href="#">2.º Ano</a></li>
+            <li><a href="#">Ciclo Clínico</a></li>
+            <li><a href="#">Todas as disciplinas</a></li>
+          </ul>
+        </div>
+        <div>
+          <div class="footer-col-title">Conta</div>
+          <ul class="footer-links">
+            <li><a href="#" onclick="openAuth('login');return false;">Entrar</a></li>
+            <li><a href="#" onclick="openAuth('register');return false;">Criar conta</a></li>
+            <li><a href="#">Contacto</a></li>
+          </ul>
+        </div>
+      </div>
+      <div class="footer-bottom">
+        <span>© 2025 SULCUS — Todos os direitos reservados</span>
+        <div style="display:flex;gap:20px;">
+          <a href="#">Privacidade</a>
+          <a href="#">Termos</a>
+        </div>
+      </div>
+    </div>
+  </footer>
+
+</div><!-- /page-landing -->
+
+
+<!-- ══════════════════════════════════════════
+     AUTH MODAL
+══════════════════════════════════════════ -->
+<div class="modal-overlay" id="auth-modal" onclick="closeAuthIfBg(event)">
+  <div class="auth-card" id="auth-card-inner">
+    <div class="auth-logo">SUL<span style="color:var(--accent)">C</span>US</div>
+    <div class="auth-tabs">
+      <button class="auth-tab active" id="tab-login" onclick="authTab('login')">Entrar</button>
+      <button class="auth-tab" id="tab-register" onclick="authTab('register')">Criar conta</button>
+    </div>
+    <div class="auth-body">
+      <!-- Login -->
+      <div id="f-login">
+        <div class="auth-title">Bem-vindo de volta</div>
+        <div class="auth-sub">// continua onde paraste</div>
+        <div class="err-box" id="e-login"></div>
+        <div class="success-box" id="s-login"></div>
+        <button class="btn-google" onclick="doGoogleLogin()">
+          <svg width="16" height="16" viewBox="0 0 24 24"><path fill="#4285F4" d="M22.56 12.25c0-.78-.07-1.53-.2-2.25H12v4.26h5.92c-.26 1.37-1.04 2.53-2.21 3.31v2.77h3.57c2.08-1.92 3.28-4.74 3.28-8.09z"/><path fill="#34A853" d="M12 23c2.97 0 5.46-.98 7.28-2.66l-3.57-2.77c-.98.66-2.23 1.06-3.71 1.06-2.86 0-5.29-1.93-6.16-4.53H2.18v2.84C3.99 20.53 7.7 23 12 23z"/><path fill="#FBBC05" d="M5.84 14.09c-.22-.66-.35-1.36-.35-2.09s.13-1.43.35-2.09V7.07H2.18C1.43 8.55 1 10.22 1 12s.43 3.45 1.18 4.93l3.66-2.84z"/><path fill="#EA4335" d="M12 5.38c1.62 0 3.06.56 4.21 1.64l3.15-3.15C17.45 2.09 14.97 1 12 1 7.7 1 3.99 3.47 2.18 7.07l3.66 2.84c.87-2.6 3.3-4.53 6.16-4.53z"/></svg>
+          Entrar com Google
+        </button>
+        <div class="auth-divider">ou</div>
+        <div class="field"><label>Email</label><input type="email" id="l-email" placeholder="o.teu@email.com"></div>
+        <div class="field"><label>Password</label><input type="password" id="l-pass" placeholder="••••••••" onkeydown="if(event.key==='Enter')doLogin()"></div>
+        <div class="forgot-link"><a href="#" onclick="showForgotPassword();return false;">Esqueci a password</a></div>
+        <button class="btn-auth" onclick="doLogin()">Entrar na plataforma →</button>
+        <div class="auth-footer-note">Ainda não tens conta? <a href="#" onclick="authTab('register');return false;">Cria uma agora</a></div>
+      </div>
+      <!-- Forgot Password -->
+      <div id="f-forgot" style="display:none">
+        <div class="auth-title">Recuperar password</div>
+        <div class="auth-sub">// envia-te um link por email</div>
+        <div class="err-box" id="e-forgot"></div>
+        <div class="success-box" id="s-forgot"></div>
+        <div class="field"><label>Email</label><input type="email" id="fp-email" placeholder="o.teu@email.com" onkeydown="if(event.key==='Enter')doForgotPassword()"></div>
+        <button class="btn-auth" onclick="doForgotPassword()">Enviar link de recuperação →</button>
+        <div class="auth-footer-note"><a href="#" onclick="authTab('login');return false;">← Voltar ao login</a></div>
+      </div>
+      <!-- Register -->
+      <div id="f-register" style="display:none">
+        <div class="auth-title">Cria a tua conta</div>
+        <div class="auth-sub">// grátis para começar</div>
+        <div class="err-box" id="e-reg"></div>
+        <button class="btn-google" onclick="doGoogleLogin()">
+          <svg width="16" height="16" viewBox="0 0 24 24"><path fill="#4285F4" d="M22.56 12.25c0-.78-.07-1.53-.2-2.25H12v4.26h5.92c-.26 1.37-1.04 2.53-2.21 3.31v2.77h3.57c2.08-1.92 3.28-4.74 3.28-8.09z"/><path fill="#34A853" d="M12 23c2.97 0 5.46-.98 7.28-2.66l-3.57-2.77c-.98.66-2.23 1.06-3.71 1.06-2.86 0-5.29-1.93-6.16-4.53H2.18v2.84C3.99 20.53 7.7 23 12 23z"/><path fill="#FBBC05" d="M5.84 14.09c-.22-.66-.35-1.36-.35-2.09s.13-1.43.35-2.09V7.07H2.18C1.43 8.55 1 10.22 1 12s.43 3.45 1.18 4.93l3.66-2.84z"/><path fill="#EA4335" d="M12 5.38c1.62 0 3.06.56 4.21 1.64l3.15-3.15C17.45 2.09 14.97 1 12 1 7.7 1 3.99 3.47 2.18 7.07l3.66 2.84c.87-2.6 3.3-4.53 6.16-4.53z"/></svg>
+          Registar com Google
+        </button>
+        <div class="auth-divider">ou com email</div>
+        <div class="field-row">
+          <div class="field"><label>Nome</label><input type="text" id="r-nome" placeholder="João"></div>
+          <div class="field"><label>Apelido</label><input type="text" id="r-ape" placeholder="Silva"></div>
+        </div>
+        <div class="field"><label>Email</label><input type="email" id="r-email" placeholder="o.teu@email.com"></div>
+        <div class="field"><label>Curso</label>
+          <select id="r-curso">
+            <option value="">Seleciona o teu curso</option>
+            <option>Medicina — 1.º Ano</option><option>Medicina — 2.º Ano</option>
+            <option>Medicina — 3.º Ano</option><option>Medicina — 4.º Ano</option>
+            <option>Medicina — 5.º Ano</option><option>Medicina — 6.º Ano</option>
+            <option>Internato / Residência</option><option>Enfermagem</option><option>Outro</option>
+          </select>
+        </div>
+        <div class="field"><label>Password</label><input type="password" id="r-pass" placeholder="Mínimo 6 caracteres"></div>
+        <div class="field"><label>Confirmar password</label><input type="password" id="r-pass2" placeholder="Repete a password" onkeydown="if(event.key==='Enter')doRegister()"></div>
+        <button class="btn-auth" onclick="doRegister()">Criar conta grátis →</button>
+        <div class="auth-footer-note">Já tens conta? <a href="#" onclick="authTab('login');return false;">Entra aqui</a></div>
+      </div>
+    </div>
+  </div>
+</div>
+
+
+<!-- ══════════════════════════════════════════
+     APP
+══════════════════════════════════════════ -->
+<div id="page-app" class="page">
+
+  <div class="sidebar-overlay" id="sidebar-overlay" onclick="closeMobileSidebar()"></div>
+
+  <!-- Sidebar -->
+  <div class="sidebar" id="sidebar">
+    <div class="sidebar-header">
+      <div style="display:flex;align-items:center;cursor:pointer;" onclick="showView('home')" title="Início">
+        <div class="logo-type logo-text-wrap">SUL<span>C</span>US</div>
+      </div>
+      <button class="collapse-btn" onclick="toggleSidebar()">
+        <svg width="14" height="14" viewBox="0 0 14 14" fill="none"><path d="M9 2L4 7l5 5" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/></svg>
+      </button>
+    </div>
+    <div class="sidebar-nav" id="sidebar-nav"></div>
+    <div class="sidebar-footer">
+      <div class="user-row" onclick="showView('perfil')">
+        <div class="user-av" id="ua">?</div>
+        <div class="user-info">
+          <div class="user-name-text" id="un">—</div>
+          <div class="user-curso-text" id="uc">—</div>
+        </div>
+      </div>
+      <div class="prog-wrap">
+        <div class="prog-label"><span>Progresso geral</span><span style="color:var(--accent)" id="prog-pct">0%</span></div>
+        <div class="prog-bar"><div class="prog-fill" id="prog-fill"></div></div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Main -->
+  <div class="main">
+    <div class="topbar">
+      <div style="display:flex;align-items:center;gap:8px;">
+        <button class="icon-btn" id="hamburger-btn" onclick="openMobileSidebar()" style="display:none;">
+          <svg width="14" height="14" viewBox="0 0 14 14" fill="none"><path d="M1 3h12M1 7h12M1 11h12" stroke="currentColor" stroke-width="1.4" stroke-linecap="round"/></svg>
+        </button>
+        <div class="tab-nav" id="tab-nav">
+          <button class="tab-btn active" onclick="showTab('resumo',this)">Resumo</button>
+          <button class="tab-btn" onclick="showTab('mapa',this)">Mapa mental</button>
+          <button class="tab-btn" onclick="showTab('flashcards',this)">Flashcards</button>
+          <button class="tab-btn" onclick="showTab('progresso',this)">Progresso</button>
+        </div>
+      </div>
+      <div class="topbar-right">
+        <div class="pill accent" id="topic-pill">— disciplina —</div>
+        <button class="icon-btn" onclick="doLogout()" title="Sair">
+          <svg width="14" height="14" viewBox="0 0 14 14" fill="none"><path d="M9 2h3v10H9M6 10l3-3-3-3M9 7H2" stroke="currentColor" stroke-width="1.3" stroke-linecap="round" stroke-linejoin="round"/></svg>
+        </button>
+      </div>
+    </div>
+
+    <div class="content">
+
+      <!-- HOME -->
+      <div id="view-home" class="view active" style="margin:-24px -28px;">
+        <div class="home-view">
+          <div class="home-bg-lines"></div>
+          <div class="home-sulcus-wrap">
+            <div class="home-sulcus-3d-wrap">
+              <div class="home-sulcus">SUL<span>C</span>US</div>
+              <div class="home-sulcus-underline"></div>
+            </div>
+            <div class="home-tagline">
+              Cada sulco cerebral aumenta a superfície do córtex.<br>
+              <strong>Cada conceito aprendido expande o teu pensamento.</strong>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- ESTUDO -->
+      <div id="view-estudo" class="view">
+        <div class="welcome-banner" id="welcome-banner" style="display:none">
+          <div class="welcome-banner-icon"><svg width="16" height="16" viewBox="0 0 16 16" fill="none"><circle cx="8" cy="8" r="6" stroke="currentColor" stroke-width="1.3"/><path d="M8 5v4M8 10.5v.5" stroke="currentColor" stroke-width="1.3" stroke-linecap="round"/></svg></div>
+          <span id="welcome-text"></span>
+        </div>
+
+        <!-- Resumo -->
+        <div id="tab-resumo" class="view active">
+          <div class="card">
+            <div class="tag tag-accent">Resumo</div>
+            <div class="card-title" id="r-title">Seleciona uma disciplina</div>
+            <div class="card-sub">Escolhe uma disciplina no menu lateral para começar</div>
+            <div class="body-text" id="r-body">
+              <p style="color:var(--hint);font-style:italic;font-family:'Instrument Serif',serif;">Seleciona uma disciplina no menu lateral para ver o conteúdo.</p>
+            </div>
+            <div class="ai-box">
+              <div class="ai-box-header">// Pergunta à IA sobre este tema</div>
+              <div class="ai-input-row">
+                <input class="ai-input" id="ai-q" placeholder="Ex: Qual a diferença entre IC direita e esquerda?">
+                <button class="ai-btn" id="ai-btn" onclick="askAI()">Perguntar →</button>
+              </div>
+              <div class="thinking" id="thinking"><div class="da"></div><div class="da"></div><div class="da"></div><span style="margin-left:6px">A pensar...</span></div>
+              <div class="ai-resp" id="ai-resp"></div>
+            </div>
+            <div class="divider"></div>
+            <div class="btn-row">
+              <button class="btn-ghost-app" onclick="showTab('mapa',document.querySelectorAll('.tab-btn')[1])">Ver mapa mental</button>
+              <button class="btn-primary-app" onclick="showTab('flashcards',document.querySelectorAll('.tab-btn')[2])">Ir para flashcards →</button>
+            </div>
+          </div>
+        </div>
+
+        <!-- Mapa Mental -->
+        <div id="tab-mapa" class="view">
+          <div class="card">
+            <div class="tag tag-teal">Mapa mental interativo</div>
+            <div class="card-title" id="mm-title">Insuficiência Cardíaca</div>
+            <div class="card-sub">Clica num nó para aprofundar · arrasta para navegar</div>
+            <div class="mm-tip" id="mm-tip"></div>
+            <div class="mm-wrap" id="mm-wrap">
+              <svg id="mm-svg" viewBox="0 0 700 340">
+                <defs>
+                  <marker id="arr" viewBox="0 0 10 10" refX="8" refY="5" markerWidth="5" markerHeight="5" orient="auto-start-reverse">
+                    <path d="M2 2L8 5L2 8" fill="none" stroke="rgba(196,70,10,0.4)" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/>
+                  </marker>
+                </defs>
+                <g id="mm-pan">
+                  <line x1="249" y1="163" x2="162" y2="95" stroke="rgba(196,70,10,0.2)" stroke-width="1" marker-end="url(#arr)"/>
+                  <line x1="249" y1="175" x2="152" y2="178" stroke="rgba(196,70,10,0.2)" stroke-width="1" marker-end="url(#arr)"/>
+                  <line x1="249" y1="187" x2="162" y2="255" stroke="rgba(196,70,10,0.2)" stroke-width="1" marker-end="url(#arr)"/>
+                  <line x1="451" y1="163" x2="538" y2="95" stroke="rgba(196,70,10,0.2)" stroke-width="1" marker-end="url(#arr)"/>
+                  <line x1="451" y1="175" x2="548" y2="178" stroke="rgba(196,70,10,0.2)" stroke-width="1" marker-end="url(#arr)"/>
+                  <line x1="451" y1="187" x2="538" y2="255" stroke="rgba(196,70,10,0.2)" stroke-width="1" marker-end="url(#arr)"/>
+                  <g class="mm-node" onclick="mmClick('O que é a insuficiência cardíaca? Define clinicamente.')">
+                    <ellipse cx="350" cy="175" rx="100" ry="32" fill="#1A1208" stroke="#C4460A" stroke-width="1.5"/>
+                    <text x="350" y="175" text-anchor="middle" dominant-baseline="central" fill="#F5F0E8" font-size="13" font-weight="500" font-family="Bebas Neue,sans-serif" letter-spacing="0.06em">Insuf. Cardíaca</text>
+                  </g>
+                  <g class="mm-node" onclick="mmClick('Explica a diferença entre IC sistólica (FE reduzida) e IC diastólica (FE preservada).')">
+                    <rect x="60" y="74" width="110" height="36" fill="#EDE8DC" stroke="#C4B99A" stroke-width="1"/>
+                    <text x="115" y="92" text-anchor="middle" dominant-baseline="central" fill="#6B5B3E" font-size="11" font-weight="500" font-family="DM Sans,sans-serif">Tipos de IC</text>
+                  </g>
+                  <text x="115" y="118" text-anchor="middle" fill="#A89880" font-size="10" font-family="IBM Plex Mono,monospace">Sistólica · Diastólica</text>
+                  <g class="mm-node" onclick="mmClick('Quais são as principais causas de insuficiência cardíaca?')">
+                    <rect x="48" y="158" width="110" height="36" fill="#EDE8DC" stroke="#C4B99A" stroke-width="1"/>
+                    <text x="103" y="176" text-anchor="middle" dominant-baseline="central" fill="#6B5B3E" font-size="11" font-weight="500" font-family="DM Sans,sans-serif">Causas</text>
+                  </g>
+                  <text x="103" y="203" text-anchor="middle" fill="#A89880" font-size="10" font-family="IBM Plex Mono,monospace">HTA · DAC · Cardiomiopatia</text>
+                  <g class="mm-node" onclick="mmClick('Quais são os sintomas clássicos da insuficiência cardíaca e como se explicam?')">
+                    <rect x="58" y="238" width="112" height="36" fill="#EDE8DC" stroke="#C4B99A" stroke-width="1"/>
+                    <text x="114" y="256" text-anchor="middle" dominant-baseline="central" fill="#6B5B3E" font-size="11" font-weight="500" font-family="DM Sans,sans-serif">Sintomas</text>
+                  </g>
+                  <text x="114" y="282" text-anchor="middle" fill="#A89880" font-size="10" font-family="IBM Plex Mono,monospace">Dispneia · Edema · Fadiga</text>
+                  <g class="mm-node" onclick="mmClick('Como se faz o diagnóstico de insuficiência cardíaca? Quais os exames chave?')">
+                    <rect x="530" y="74" width="114" height="36" fill="#E8F5EE" stroke="rgba(42,122,85,0.4)" stroke-width="1"/>
+                    <text x="587" y="92" text-anchor="middle" dominant-baseline="central" fill="#2A7A55" font-size="11" font-weight="500" font-family="DM Sans,sans-serif">Diagnóstico</text>
+                  </g>
+                  <text x="587" y="118" text-anchor="middle" fill="#A89880" font-size="10" font-family="IBM Plex Mono,monospace">Eco · BNP · Rx tórax</text>
+                  <g class="mm-node" onclick="mmClick('Qual o tratamento farmacológico da insuficiência cardíaca com FE reduzida?')">
+                    <rect x="534" y="158" width="114" height="36" fill="#E8F5EE" stroke="rgba(42,122,85,0.4)" stroke-width="1"/>
+                    <text x="591" y="176" text-anchor="middle" dominant-baseline="central" fill="#2A7A55" font-size="11" font-weight="500" font-family="DM Sans,sans-serif">Tratamento</text>
+                  </g>
+                  <text x="591" y="203" text-anchor="middle" fill="#A89880" font-size="10" font-family="IBM Plex Mono,monospace">IECA · BB · MRA · SGLT2i</text>
+                  <g class="mm-node" onclick="mmClick('Como se classifica a IC pela NYHA e qual a importância prognóstica?')">
+                    <rect x="524" y="238" width="120" height="36" fill="#EDE8DC" stroke="#C4B99A" stroke-width="1"/>
+                    <text x="584" y="256" text-anchor="middle" dominant-baseline="central" fill="#6B5B3E" font-size="11" font-weight="500" font-family="DM Sans,sans-serif">Classificação</text>
+                  </g>
+                  <text x="584" y="282" text-anchor="middle" fill="#A89880" font-size="10" font-family="IBM Plex Mono,monospace">NYHA I–IV</text>
+                </g>
+              </svg>
+              <div class="mm-controls">
+                <button class="mm-ctrl-btn" onclick="mmZoom(1.2)">+</button>
+                <button class="mm-ctrl-btn" onclick="mmZoom(0.83)">−</button>
+                <button class="mm-ctrl-btn" onclick="mmReset()">reset</button>
+              </div>
+            </div>
+            <div class="mm-resp" id="mm-resp"></div>
+          </div>
+        </div>
+
+        <!-- Flashcards -->
+        <div id="tab-flashcards" class="view">
+          <div class="card">
+            <div class="tag tag-accent">Flashcards</div>
+            <div class="fc-hdr">
+              <div class="fc-ctr" id="fc-ctr">0 cartões</div>
+              <div class="fc-dots" id="fc-dots"></div>
+            </div>
+            <div class="flashcard" id="fc-card" onclick="revealCard()">
+              <div id="fc-front">
+                <div class="fc-lbl">Pergunta</div>
+                <div class="fc-q" id="fc-q">Seleciona uma disciplina para começar.</div>
+                <div class="fc-hint">// clica para revelar a resposta</div>
+              </div>
+              <div id="fc-back" style="display:none">
+                <div class="fc-lbl">Resposta</div>
+                <div class="fc-a" id="fc-a"></div>
+              </div>
+            </div>
+            <div class="rating-row" id="rating-row">
+              <button class="r-btn r-hard" onclick="nextCard('hard')">Difícil</button>
+              <button class="r-btn r-med" onclick="nextCard('med')">OK</button>
+              <button class="r-btn r-easy" onclick="nextCard('easy')">Fácil</button>
+            </div>
+            <div class="fc-nav">
+              <button class="btn-ghost-app" onclick="prevCard()">← Anterior</button>
+              <button class="btn-ghost-app" onclick="nextCard(null)">Seguinte →</button>
+            </div>
+          </div>
+        </div>
+
+        <!-- Progresso -->
+        <div id="tab-progresso" class="view">
+          <div class="card">
+            <div class="tag tag-teal">Progresso</div>
+            <div class="stats-grid">
+              <div class="stat-card"><div class="stat-val" id="prog-fc">0</div><div class="stat-lbl">Flashcards revistos</div></div>
+              <div class="stat-card"><div class="stat-val" id="prog-acerto">—</div><div class="stat-lbl">Taxa de acerto</div></div>
+              <div class="stat-card"><div class="stat-val" id="prog-disciplinas">0</div><div class="stat-lbl">Disciplinas estudadas</div></div>
+            </div>
+            <div id="topic-progress-list" style="margin-top:8px;"></div>
+            <div class="next-rev"><div class="rev-dot"></div>Próxima revisão recomendada: amanhã de manhã</div>
+          </div>
+        </div>
+      </div>
+
+      <!-- ADMIN -->
+      <div id="view-admin" class="view">
+        <div class="card">
+          <div class="tag tag-accent">Gestão de conteúdo</div>
+          <div class="card-title">Admin</div>
+          <div class="card-sub">Adiciona matérias e flashcards para a disciplina seleccionada.</div>
+          <div class="admin-grid">
+            <div class="admin-card" onclick="adminSection('materia')">
+              <div class="admin-card-icon" style="background:rgba(196,70,10,0.08);">📄</div>
+              <div class="admin-card-title">Adicionar matéria</div>
+              <div class="admin-card-sub">// Novo resumo e conceitos</div>
+            </div>
+            <div class="admin-card" onclick="adminSection('flashcards')">
+              <div class="admin-card-icon" style="background:var(--teal-bg);">🃏</div>
+              <div class="admin-card-title">Gerir flashcards</div>
+              <div class="admin-card-sub">// Adicionar ou remover cartões</div>
+            </div>
+          </div>
+
+          <div id="admin-materia" style="display:none">
+            <div class="form-section">
+              <div class="form-section-title">// Nova matéria</div>
+              <div class="success-msg" id="sm-materia">✓ Matéria adicionada com sucesso.</div>
+              <div class="form-field"><label>Nome da matéria</label><input type="text" id="m-nome" placeholder="Ex: Insuficiência Cardíaca"></div>
+              <div class="form-field"><label>Resumo principal</label><textarea id="m-resumo" rows="4" placeholder="Introdução ao tema..."></textarea></div>
+              <div style="display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-bottom:10px;">
+                <div class="form-field"><label>Conceito 1</label><input type="text" id="m-c1" placeholder="Nome"></div>
+                <div class="form-field"><label>Descrição</label><input type="text" id="m-c1d" placeholder="Descrição breve"></div>
+                <div class="form-field"><label>Conceito 2</label><input type="text" id="m-c2" placeholder="Nome"></div>
+                <div class="form-field"><label>Descrição</label><input type="text" id="m-c2d" placeholder="Descrição breve"></div>
+                <div class="form-field"><label>Conceito 3</label><input type="text" id="m-c3" placeholder="Nome"></div>
+                <div class="form-field"><label>Descrição</label><input type="text" id="m-c3d" placeholder="Descrição breve"></div>
+              </div>
+              <button class="btn-primary-app" onclick="saveMateria()">Guardar matéria →</button>
+            </div>
+          </div>
+
+          <div id="admin-flashcards" style="display:none">
+            <div class="form-section">
+              <div class="form-section-title">// Gerir flashcards</div>
+              <div class="success-msg" id="sm-fc">✓ Flashcard adicionado.</div>
+              <div class="fc-admin-list" id="fc-admin-list"></div>
+              <div class="add-fc-row">
+                <div class="form-field"><label>Pergunta</label><textarea id="fc-new-q" rows="2" placeholder="Pergunta do flashcard..."></textarea></div>
+                <div class="form-field"><label>Resposta</label><textarea id="fc-new-a" rows="2" placeholder="Resposta completa..."></textarea></div>
+              </div>
+              <button class="btn-primary-app" onclick="addFlashcard()">Adicionar flashcard →</button>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- PERFIL -->
+      <div id="view-perfil" class="view">
+        <div class="card">
+          <div class="profile-header">
+            <div class="profile-av-big" id="pav">?</div>
+            <div>
+              <div class="profile-name-big" id="p-name">—</div>
+              <div class="profile-role" id="p-curso">—</div>
+            </div>
+          </div>
+          <div class="profile-sections">
+            <div class="profile-section">
+              <div class="profile-section-title">Informações</div>
+              <div class="profile-row"><span class="profile-key">Email</span><span class="profile-val" id="p-email">—</span></div>
+              <div class="profile-row"><span class="profile-key">Plano</span><span class="profile-val"><span class="badge-plan">Grátis</span></span></div>
+              <div class="profile-row"><span class="profile-key">Membro desde</span><span class="profile-val" id="p-since">—</span></div>
+            </div>
+            <div class="profile-section">
+              <div class="profile-section-title">Estatísticas</div>
+              <div class="profile-row"><span class="profile-key">Flashcards revistos</span><span class="profile-val" id="pi-fc">0</span></div>
+              <div class="profile-row"><span class="profile-key">Taxa de acerto</span><span class="profile-val" id="pi-acerto">—</span></div>
+              <div class="profile-row"><span class="profile-key">Disciplinas</span><span class="profile-val" id="pi-disciplinas">0</span></div>
+              <div class="profile-row"><span class="profile-key">Dias de estudo</span><span class="profile-val" id="pi-dias">0</span></div>
+            </div>
+          </div>
+          <div style="margin-top:16px;">
+            <button class="btn-ghost-app" onclick="doLogout()">Terminar sessão →</button>
+          </div>
+        </div>
+      </div>
+
+    </div><!-- /content -->
+  </div><!-- /main -->
+
+</div><!-- /page-app -->
+
+<!-- Toast -->
+<div class="toast" id="toast"></div>
+
+<!-- ══════════════════════════════════════════
+     JAVASCRIPT
+══════════════════════════════════════════ -->
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+<script>
+/* ══ CONFIG SUPABASE ══ */
+const SUPA_URL = 'https://kwqqydfdzlflxgyavwjl.supabase.co';
+const SUPA_KEY = 'sb_publishable_NPe4mSBM4Quz61uPh7e-VA_tKoA-Dbj';
+const supa = supabase.createClient(SUPA_URL, SUPA_KEY);
+
+/* ══ STORAGE LOCAL (fallback/cache) ══ */
+const S = {
+  get(k, d=null){try{const v=localStorage.getItem(k);return v?JSON.parse(v):d;}catch{return d;}},
+  set(k,v){try{localStorage.setItem(k,JSON.stringify(v));}catch{}},
+  del(k){try{localStorage.removeItem(k);}catch{}}
+};
+
+/* ══ SUPABASE AUTH ══ */
+
+async function doLogin(){
+  const email=document.getElementById("l-email").value.trim();
+  const pass=document.getElementById("l-pass").value;
+  const err=document.getElementById("e-login");
+  err.classList.remove("show");
+  if(!email||!pass){err.textContent="Preenche todos os campos.";err.classList.add("show");return;}
+  const btn=document.querySelector("#f-login .btn-auth");
+  btn.textContent="A entrar...";btn.disabled=true;
+  try{
+    const {data,error}=await supa.auth.signInWithPassword({email,password:pass});
+    btn.textContent="Entrar na plataforma u2192";btn.disabled=false;
+    if(error){
+      if(error.message.includes("Invalid login credentials")||error.message.includes("invalid_credentials")){
+        err.textContent="Email ou password incorretos.";
+      } else if(error.message.includes("Email not confirmed")||error.message.includes("email_not_confirmed")){
+        err.textContent="Confirma o teu email antes de entrar. Verifica a caixa de entrada.";
+      } else {
+        err.textContent=error.message;
+      }
+      err.classList.add("show");return;
+    }
+    if(!data||!data.user){err.textContent="Erro inesperado. Tenta novamente.";err.classList.add("show");return;}
+    const meta=data.user.user_metadata||{};
+    const session={email:data.user.email,nome:meta.nome||"Utilizador",ape:meta.ape||"",curso:meta.curso||"",since:meta.since||new Date().toLocaleDateString("pt-PT",{month:"short",year:"numeric"}),uid:data.user.id};
+    S.set("sulcus_session",session);
+    closeAuth();
+    const isNew=!S.get("sulcus_onboard_"+email);
+    isNew?startOnboarding(session):enterApp(session);
+  }catch(e){
+    btn.textContent="Entrar na plataforma u2192";btn.disabled=false;
+    err.textContent="Sem ligacao. Verifica a internet e tenta novamente.";
+    err.classList.add("show");
+  }
+}
+
+async function doRegister(){
+  const nome=document.getElementById('r-nome').value.trim();
+  const ape=document.getElementById('r-ape').value.trim();
+  const email=document.getElementById('r-email').value.trim();
+  const curso=document.getElementById('r-curso').value;
+  const pass=document.getElementById('r-pass').value;
+  const pass2=document.getElementById('r-pass2').value;
+  const err=document.getElementById('e-reg');
+  err.classList.remove('show');
+  if(!nome||!ape||!email||!curso||!pass){err.textContent='Preenche todos os campos.';err.classList.add('show');return;}
+  if(!email.includes('@')){err.textContent='Email inválido.';err.classList.add('show');return;}
+  if(pass.length<6){err.textContent='Password com mínimo 6 caracteres.';err.classList.add('show');return;}
+  if(pass!==pass2){err.textContent='As passwords não coincidem.';err.classList.add('show');return;}
+  const btn=document.querySelector('#f-register .btn-auth');
+  btn.textContent='A criar conta...';btn.disabled=true;
+  const since=new Date().toLocaleDateString('pt-PT',{month:'short',year:'numeric'});
+  const {data,error}=await supa.auth.signUp({
+    email,password:pass,
+    options:{data:{nome,ape,curso,since}}
+  });
+  btn.textContent='Criar conta grátis →';btn.disabled=false;
+  if(error){
+    if(error.message.includes('already registered')||error.message.includes('already been registered')){
+      err.textContent='Este email já está registado. Tenta fazer login.';
+    } else {
+      err.textContent=error.message;
+    }
+    err.classList.add('show');return;
+  }
+  // Supabase retorna identities vazio quando o email já existe mas confirmação está ativa
+  if(data.user&&data.user.identities&&data.user.identities.length===0){
+    err.textContent='Este email já está registado. Tenta fazer login.';
+    err.classList.add('show');return;
+  }
+  // Mostrar ecrã de confirmação pendente
+  closeAuth();
+  showEmailPending(email);
+}
+
+async function doLogout(){
+  await supa.auth.signOut();
+  S.del('sulcus_session');
+  currentSession=null;
+  showPage('landing');
+}
+
+/* ══ FEEDBACK SCREENS ══ */
+function showEmailPending(email){
+  const ob=document.getElementById('page-onboarding');
+  ob.style.display='flex';
+  ob.innerHTML=`
+    <div class="ob-card" style="text-align:center;max-width:420px;">
+      <div style="font-size:48px;margin-bottom:16px;">📬</div>
+      <div class="ob-title" style="font-size:26px;">Confirma o teu email</div>
+      <div class="ob-sub" style="margin-top:12px;">Enviámos um link de confirmação para<br><strong style="color:var(--text)">${email}</strong></div>
+      <div style="margin-top:24px;padding:16px;background:var(--surface2);border:1px solid var(--border);font-size:12px;color:var(--muted);font-family:'IBM Plex Mono',monospace;line-height:1.8;">
+        1. Abre o teu email<br>
+        2. Clica no link de confirmação<br>
+        3. Volta aqui e faz login
+      </div>
+      <button class="btn-ob-next" style="margin-top:24px;width:100%;" onclick="hideEmailPending()">Já confirmei → Fazer login</button>
+    </div>`;
+}
+function hideEmailPending(){
+  const ob=document.getElementById('page-onboarding');
+  ob.style.display='none';
+  openAuth('login');
+}
+
+function showEmailConfirmed(){
+  const ob=document.getElementById('page-onboarding');
+  ob.style.display='flex';
+  ob.innerHTML=`
+    <div class="ob-card" style="text-align:center;max-width:420px;">
+      <div style="font-size:48px;margin-bottom:16px;">✅</div>
+      <div class="ob-title" style="font-size:26px;color:var(--teal)">Email confirmado!</div>
+      <div class="ob-sub" style="margin-top:12px;">A tua conta foi verificada com sucesso.<br>Já podes entrar na plataforma.</div>
+      <button class="btn-ob-next" style="margin-top:24px;width:100%;background:var(--teal);" onclick="hideEmailPending()">Entrar na plataforma →</button>
+    </div>`;
+  setTimeout(()=>hideEmailPending(),4000);
+}
+
+function showResetPassword(){
+  const ob=document.getElementById('page-onboarding');
+  ob.style.display='flex';
+  ob.innerHTML=`
+    <div class="ob-card" style="max-width:420px;">
+      <div class="ob-title" style="font-size:24px;">Nova password</div>
+      <div class="ob-sub" style="margin-top:8px;margin-bottom:20px;">// define a tua nova password</div>
+      <div class="err-box" id="e-reset" style="display:none;background:var(--red-bg);border:1px solid var(--red);padding:10px 13px;font-size:11px;color:var(--red);margin-bottom:12px;font-family:'IBM Plex Mono',monospace;"></div>
+      <div class="success-box" id="s-reset" style="display:none;background:var(--teal-bg);border:1px solid rgba(42,122,85,0.3);padding:10px 13px;font-size:11px;color:var(--teal);margin-bottom:12px;font-family:'IBM Plex Mono',monospace;"></div>
+      <div class="field" style="margin-bottom:12px;"><label style="display:block;font-size:10px;color:var(--muted);margin-bottom:5px;text-transform:uppercase;letter-spacing:0.08em;font-family:'IBM Plex Mono',monospace;">Nova password</label><input type="password" id="new-pass" placeholder="Mínimo 6 caracteres" style="width:100%;background:var(--bg);border:1px solid var(--border);padding:10px 13px;color:var(--text);font-size:13px;font-family:'DM Sans',sans-serif;outline:none;"></div>
+      <div class="field" style="margin-bottom:16px;"><label style="display:block;font-size:10px;color:var(--muted);margin-bottom:5px;text-transform:uppercase;letter-spacing:0.08em;font-family:'IBM Plex Mono',monospace;">Confirmar password</label><input type="password" id="new-pass2" placeholder="Repete a password" style="width:100%;background:var(--bg);border:1px solid var(--border);padding:10px 13px;color:var(--text);font-size:13px;font-family:'DM Sans',sans-serif;outline:none;"></div>
+      <button class="btn-ob-next" style="width:100%;" onclick="doResetPassword()">Guardar nova password →</button>
+    </div>`;
+}
+async function doResetPassword(){
+  const pass=document.getElementById('new-pass').value;
+  const pass2=document.getElementById('new-pass2').value;
+  const err=document.getElementById('e-reset');
+  const suc=document.getElementById('s-reset');
+  err.style.display='none';suc.style.display='none';
+  if(pass.length<6){err.textContent='Mínimo 6 caracteres.';err.style.display='block';return;}
+  if(pass!==pass2){err.textContent='As passwords não coincidem.';err.style.display='block';return;}
+  const {error}=await supa.auth.updateUser({password:pass});
+  if(error){err.textContent=error.message;err.style.display='block';return;}
+  suc.textContent='Password alterada com sucesso! A redirecionar...';suc.style.display='block';
+  setTimeout(async()=>{
+    const {data:{session:s}}=await supa.auth.getSession();
+    const ob=document.getElementById('page-onboarding');ob.style.display='none';
+    if(s){
+      const meta=s.user.user_metadata||{};
+      const session={email:s.user.email,nome:meta.nome||'Utilizador',ape:meta.ape||'',curso:meta.curso||'',since:meta.since||'',uid:s.user.id};
+      S.set('sulcus_session',session);
+      enterApp(session);
+    } else {openAuth('login');}
+  },2000);
+}
+
+function showWelcomeBanner(nome){
+  // Toast de boas-vindas no topo do app
+  const t=document.getElementById('toast');
+  t.textContent=`Bem-vindo de volta, ${nome}! 👋`;
+  t.className='toast show';
+  setTimeout(()=>t.classList.remove('show'),4000);
+}
+
+/* ══ DISCIPLINAS ══ */
+const DISCIPLINAS = [
+  {id:'filosofia',nome:'Filosofia',ano:'1.º Ano',cor:'accent',
+    resumo:'<p>A Filosofia na medicina aborda os fundamentos éticos e epistemológicos da prática clínica. Estuda a natureza do conhecimento médico, a relação médico-doente e os dilemas bioéticos.</p><p>Os conceitos de <span class="hl">autonomia</span>, <span class="hl-teal">beneficência</span>, <span class="hl-amber">não-maleficência</span> e <span class="hl">justiça</span> formam os quatro pilares da bioética médica moderna.</p>',
+    conceitos:[{t:'Bioética',b:'Ramo da ética aplicada à medicina e ciências da vida'},{t:'Epistemologia',b:'Estudo do conhecimento e dos seus fundamentos'},{t:'Deontologia',b:'Conjunto de deveres e normas profissionais do médico'}],
+    cards:[{q:'Quais são os 4 princípios da bioética?',a:'Autonomia (respeito pela vontade do doente), Beneficência (fazer o bem), Não-maleficência (não causar dano) e Justiça (equidade no acesso).'}]
+  },
+  {id:'bioquimica',nome:'Bioquímica',ano:'1.º Ano',cor:'teal',
+    resumo:'<p>A Bioquímica estuda as reações químicas que ocorrem nos sistemas vivos. A compreensão do metabolismo é essencial para entender a fisiopatologia das doenças.</p><p>O <span class="hl">ciclo de Krebs</span>, a <span class="hl-teal">glicólise</span> e a <span class="hl-amber">cadeia transportadora de eletrões</span> são os principais processos de produção de energia celular.</p>',
+    conceitos:[{t:'ATP',b:'Molécula de energia celular — "moeda energética" do organismo'},{t:'Glicólise',b:'Via de degradação da glucose em piruvato, com produção de 2 ATP'},{t:'Ciclo de Krebs',b:'Via aeróbia de produção de NADH e FADH2 para a cadeia respiratória'}],
+    cards:[{q:'O que é o ciclo de Krebs?',a:'Série de reações químicas nas mitocôndrias que oxidam o acetil-CoA, produzindo CO2, NADH e FADH2, que alimentam a cadeia transportadora de eletrões para produzir ATP.'},{q:'Qual a fórmula geral da glicólise?',a:'Glucose + 2 ADP + 2 Pi + 2 NAD⁺ → 2 piruvato + 2 ATP + 2 NADH + 2 H₂O'}]
+  },
+  {id:'anatomia',nome:'Anatomia Locomotora',ano:'1.º Ano',cor:'amber',
+    resumo:'<p>A Anatomia Locomotora estuda os sistemas ósseo, articular e muscular. Compreender a estrutura do aparelho locomotor é fundamental para o diagnóstico de patologias ortopédicas e neurológicas.</p><p>O esqueleto humano é composto por <span class="hl">206 ossos</span> no adulto, organizados em esqueleto <span class="hl-teal">axial</span> (80 ossos) e <span class="hl-amber">apendicular</span> (126 ossos).</p>',
+    conceitos:[{t:'Osteologia',b:'Estudo dos ossos, sua estrutura e função'},{t:'Artrologia',b:'Estudo das articulações e dos seus tipos'},{t:'Miologia',b:'Estudo dos músculos, origem, inserção e função'}],
+    cards:[{q:'Quantos ossos tem o esqueleto adulto?',a:'206 ossos — 80 do esqueleto axial (crânio, vértebras, costelas, esterno) e 126 do esqueleto apendicular (membros superiores e inferiores e cinturas).'},{q:'Quais os tipos de articulações?',a:'Fibrosas (imóveis), cartilagíneas (semimóveis) e sinoviais (móveis — as mais comuns no membro).'}]
+  },
+  {id:'histologia',nome:'Histologia Geral',ano:'1.º Ano',cor:'accent',
+    resumo:'<p>A Histologia estuda a estrutura microscópica dos tecidos. Os quatro tecidos fundamentais — <span class="hl">epitelial</span>, <span class="hl-teal">conjuntivo</span>, <span class="hl-amber">muscular</span> e <span class="hl">nervoso</span> — formam todos os órgãos do corpo humano.</p>',
+    conceitos:[{t:'Tecido Epitelial',b:'Reveste superfícies, forma glândulas, função de proteção e secreção'},{t:'Tecido Conjuntivo',b:'Suporte, ligação e nutrição — inclui osso, cartilagem e sangue'},{t:'Tecido Muscular',b:'Contração — liso, estriado esquelético e estriado cardíaco'}],
+    cards:[{q:'Quais os 4 tecidos fundamentais?',a:'Tecido epitelial (revestimento), conjuntivo (suporte), muscular (contração) e nervoso (condução de impulsos).'},{q:'Diferença entre glândulas exócrinas e endócrinas?',a:'Exócrinas secretam para ductos ou superfícies (ex: salivar, sudorípara). Endócrinas secretam hormonas diretamente para o sangue (ex: tiróide, pâncreas).'}]
+  },
+  {id:'fisiologia',nome:'Fisiologia Geral',ano:'2.º Ano',cor:'teal',
+    resumo:'<p>A Fisiologia estuda o funcionamento normal dos sistemas do organismo. A manutenção da <span class="hl">homeostase</span> é o princípio central — o organismo regula continuamente o ambiente interno para manter condições estáveis.</p><p>O sistema cardiovascular, respiratório e renal trabalham em conjunto para regular pH, temperatura, osmolalidade e pressão arterial.</p>',
+    conceitos:[{t:'Homeostase',b:'Manutenção do ambiente interno dentro de limites compatíveis com a vida'},{t:'Feedback negativo',b:'Mecanismo que atenua desvios da homeostase — o mais comum no organismo'},{t:'Potencial de ação',b:'Variação transitória do potencial de membrana — base da comunicação nervosa e muscular'}],
+    cards:[{q:'O que é a homeostase?',a:'Capacidade do organismo de manter o ambiente interno estável (pH, temperatura, osmolalidade, glicemia) apesar das variações externas, através de mecanismos de feedback negativo.'},{q:'Como funciona o feedback negativo?',a:'Um estímulo desvia um parâmetro do set point → sensores detetam o desvio → efetores corrigem o desvio → o parâmetro retorna ao normal. Exemplo: hiperglicemia → insulina → normoglicemia.'}]
+  }
+];
+
+/* ══ ESTADO GLOBAL ══ */
+let currentSession = null;
+let currentDisciplina = null;
+let cur = 0, revealed = false, scores = [];
+
+/* ══ LANDING ══ */
+window.addEventListener('scroll', () => {
+  document.getElementById('main-nav').classList.toggle('scrolled', window.scrollY > 20);
+  document.querySelectorAll('.reveal').forEach(el => {
+    if(el.getBoundingClientRect().top < window.innerHeight - 40) el.classList.add('visible');
+  });
+});
+function toggleYear(h){const i=h.nextElementSibling;const o=h.classList.contains('open');h.classList.toggle('open',!o);i.classList.toggle('open',!o);}
+function ctaSubmit(){
+  const e=document.getElementById('cta-email').value.trim();
+  if(!e||!e.includes('@')){document.getElementById('cta-email').style.borderColor='#C4460A';return;}
+  openAuth('register');
+}
+
+/* ══ AUTH MODAL ══ */
+function openAuth(tab='login'){
+  document.getElementById('auth-modal').classList.add('open');
+  authTab(tab);
+}
+function closeAuth(){document.getElementById('auth-modal').classList.remove('open');}
+function closeAuthIfBg(e){if(e.target===document.getElementById('auth-modal'))closeAuth();}
+function authTab(t){
+  document.getElementById('f-login').style.display=t==='login'?'':'none';
+  document.getElementById('f-register').style.display=t==='register'?'':'none';
+  document.getElementById('f-forgot').style.display='none';
+  document.getElementById('tab-login').classList.toggle('active',t==='login');
+  document.getElementById('tab-register').classList.toggle('active',t==='register');
+  document.getElementById('e-login').classList.remove('show');
+  document.getElementById('e-reg').classList.remove('show');
+  const sl=document.getElementById('s-login');if(sl)sl.classList.remove('show');
+}
+function showForgotPassword(){
+  document.getElementById('f-login').style.display='none';
+  document.getElementById('f-register').style.display='none';
+  document.getElementById('f-forgot').style.display='';
+  document.getElementById('tab-login').classList.remove('active');
+  document.getElementById('tab-register').classList.remove('active');
+  document.getElementById('e-forgot').classList.remove('show');
+  document.getElementById('s-forgot').classList.remove('show');
+}
+async function doForgotPassword(){
+  const email=document.getElementById('fp-email').value.trim();
+  const err=document.getElementById('e-forgot');
+  const suc=document.getElementById('s-forgot');
+  err.classList.remove('show');suc.classList.remove('show');
+  if(!email){err.textContent='Introduz o teu email.';err.classList.add('show');return;}
+  const btn=document.querySelector('#f-forgot .btn-auth');
+  btn.textContent='A enviar...';btn.disabled=true;
+  const {error}=await supa.auth.resetPasswordForEmail(email,{
+    redirectTo:'https://sulcus-bice.vercel.app'
+  });
+  btn.textContent='Enviar link de recuperação →';btn.disabled=false;
+  if(error){err.textContent=error.message;err.classList.add('show');return;}
+  suc.textContent='Link enviado! Verifica o teu email e segue as instruções.';
+  suc.classList.add('show');
+  document.getElementById('fp-email').value='';
+}
+async function doGoogleLogin(){
+  const {error}=await supa.auth.signInWithOAuth({
+    provider:'google',
+    options:{redirectTo:'https://sulcus-bice.vercel.app'}
+  });
+  if(error){toast('Erro ao conectar com Google: '+error.message,'');} 
+}
+
+/* ══ ONBOARDING ══ */
+let obStep=0,obSession=null;
+const OB_STEPS=[
+  {title:'Qual o teu objectivo?',sub:'Ajuda-nos a personalizar a tua experiência.',options:[{t:'Passar nos exames',s:'Foco em revisão e flashcards'},{t:'Aprofundar matéria',s:'Estudo detalhado e mapas mentais'},{t:'Recuperar aulas',s:'Resumos rápidos e objectivos'},{t:'Preparar internato',s:'Casos clínicos e diagnóstico'}]},
+  {title:'Como preferes estudar?',sub:'Adaptamos as ferramentas ao teu estilo.',options:[{t:'Leitura activa',s:'Resumos e notas destacadas'},{t:'Repetição espaçada',s:'Flashcards e revisões'},{t:'Visual',s:'Mapas mentais e esquemas'},{t:'Questões práticas',s:'IA e casos clínicos'}]},
+  {title:'Quanto tempo tens?',sub:'Optimizamos o conteúdo para o teu ritmo.',options:[{t:'< 30 min / dia',s:'Sessões curtas e focadas'},{t:'1 hora / dia',s:'Plano equilibrado'},{t:'2-3 horas / dia',s:'Estudo intensivo'},{t:'A tempo inteiro',s:'Preparação completa'}]}
+];
+let obSel=[];
+
+function startOnboarding(session){
+  obSession=session;obStep=0;obSel=[];
+  showPage('onboarding');
+  renderOb();
+}
+function showPage(p){
+  const landing=document.getElementById('page-landing');
+  const app=document.getElementById('page-app');
+  const ob=document.getElementById('page-onboarding');
+  landing.classList.remove('active');
+  app.classList.remove('active');
+  if(ob)ob.style.display='none';
+  window.scrollTo(0,0);
+  if(p==='landing'){landing.classList.add('active');}
+  else if(p==='app'){app.classList.add('active');app.scrollTop=0;}
+  else if(p==='onboarding'){if(ob)ob.style.display='flex';}
+}
+
+function renderOb(){
+  const ob=document.getElementById('page-onboarding');
+  if(!ob)return;
+  const s=OB_STEPS[obStep];
+  const dots=OB_STEPS.map((_,i)=>`<div class="ob-dot${i===obStep?' active':i<obStep?' done':''}"></div>`).join('');
+  const opts=s.options.map((o,i)=>`<div class="ob-option${obSel[obStep]===i?' sel':''}" onclick="obSelect(${i})"><div class="ob-option-title">${o.t}</div><div class="ob-option-sub">${o.s}</div></div>`).join('');
+  ob.innerHTML=`<div class="ob-card"><div class="ob-dots">${dots}</div><div class="ob-title">${s.title}</div><div class="ob-sub">${s.sub}</div><div class="ob-options">${opts}</div><div class="ob-nav">${obStep>0?'<button class="btn-ob-back" onclick="obBack()">← Voltar</button>':''}<button class="btn-ob-next" onclick="obNext()">${obStep===OB_STEPS.length-1?'Entrar na plataforma →':'Continuar →'}</button></div></div>`;
+}
+function obSelect(i){obSel[obStep]=i;renderOb();}
+function obNext(){if(obStep<OB_STEPS.length-1){obStep++;obSel[obStep]=obSel[obStep]??null;renderOb();}else{S.set('sulcus_onboard_'+obSession.email,true);enterApp(obSession);}}
+function obBack(){if(obStep>0){obStep--;renderOb();}}
+
+/* ══ APP ══ */
+async function enterApp(session){
+  currentSession=session;
+  S.set('sulcus_session',session);
+  const ini=session.nome?session.nome[0].toUpperCase():'?';
+  document.getElementById('ua').textContent=ini;
+  document.getElementById('un').textContent=session.nome+' '+session.ape;
+  document.getElementById('uc').textContent=session.curso||'—';
+  document.getElementById('pav').textContent=ini;
+  document.getElementById('p-name').textContent=session.nome+' '+session.ape;
+  document.getElementById('p-curso').textContent=session.curso||'—';
+  document.getElementById('p-email').textContent=session.email||'—';
+  document.getElementById('p-since').textContent=session.since||'—';
+  buildSidebar();
+  // Sincronizar stats do Supabase
+  await syncStatsFromSupabase();
+  atualizarStats();
+  showPage('app');
+  showView('home');
+  setupResponsive();
+  // Boas-vindas
+  setTimeout(()=>showWelcomeBanner(session.nome||'estudante'),400);
+  // Registar dia de estudo
+  const st=getStats();const hoje=new Date().toDateString();
+  if(!st.dias.includes(hoje)){st.dias.push(hoje);saveStats(st);}
+}
+
+/* ══ SIDEBAR ══ */
+function buildSidebar(){
+  const nav=document.getElementById('sidebar-nav');
+  let html='<div class="nav-sec-lbl">Principal</div>';
+  html+=navItem('home','home','Início','<svg width="14" height="14" viewBox="0 0 14 14" fill="none"><path d="M1 7L7 2l6 5M3 6v6h3V9h2v3h3V6" stroke="currentColor" stroke-width="1.3" stroke-linecap="round" stroke-linejoin="round"/></svg>');
+  html+='<div class="nav-sec-lbl">Ciclo Básico — 1.º Ano</div>';
+  DISCIPLINAS.filter(d=>d.ano==='1.º Ano').forEach(d=>{html+=navItem('estudo','disc_'+d.id,d.nome,`<div class="ni-dot"></div>`,d.id);});
+  html+='<div class="nav-sec-lbl">Ciclo Básico — 2.º Ano</div>';
+  DISCIPLINAS.filter(d=>d.ano==='2.º Ano').forEach(d=>{html+=navItem('estudo','disc_'+d.id,d.nome,`<div class="ni-dot"></div>`,d.id);});
+  html+='<div class="nav-sec-lbl">Gestão</div>';
+  if(isAdmin())html+=navItem('admin','admin','Admin','<svg width="14" height="14" viewBox="0 0 14 14" fill="none"><rect x="1" y="1" width="5" height="5" rx="1" stroke="currentColor" stroke-width="1.3"/><rect x="8" y="1" width="5" height="5" rx="1" stroke="currentColor" stroke-width="1.3"/><rect x="1" y="8" width="5" height="5" rx="1" stroke="currentColor" stroke-width="1.3"/><rect x="8" y="8" width="5" height="5" rx="1" stroke="currentColor" stroke-width="1.3"/></svg>');
+  html+=navItem('perfil','perfil','Perfil','<svg width="14" height="14" viewBox="0 0 14 14" fill="none"><circle cx="7" cy="4.5" r="2.5" stroke="currentColor" stroke-width="1.3"/><path d="M2 12c0-2.76 2.24-5 5-5s5 2.24 5 5" stroke="currentColor" stroke-width="1.3" stroke-linecap="round"/></svg>');
+  nav.innerHTML=html;
+}
+function navItem(view,id,label,icon,discId=null){
+  const onclick=discId?`selectDisciplina('${discId}')`:`showView('${view}')`;
+  return `<div class="nav-item" id="ni-${id}" onclick="${onclick}"><div class="ni-icon">${icon}</div><span class="ni-label">${label}</span></div>`;
+}
+function setActiveNav(id){
+  document.querySelectorAll('.nav-item').forEach(el=>el.classList.remove('active'));
+  const el=document.getElementById('ni-'+id);if(el)el.classList.add('active');
+}
+
+function showView(v){
+  if(v==='admin'&&!isAdmin()){toast('Acesso restrito.','');return;}
+  document.querySelectorAll('.view').forEach(el=>el.classList.remove('active'));
+  const el=document.getElementById('view-'+v);if(el)el.classList.add('active');
+  setActiveNav(v);
+  const tabNav=document.getElementById('tab-nav');
+  tabNav.style.display=v==='estudo'?'flex':'none';
+  document.getElementById('topic-pill').style.display=v==='estudo'?'':'none';
+  if(v==='estudo'){document.getElementById('topic-pill').style.display='';}
+  closeMobileSidebar();
+}
+
+async function selectDisciplina(id){
+  const d=DISCIPLINAS.find(x=>x.id===id);if(!d)return;
+  currentDisciplina=d;
+  showView('estudo');
+  setActiveNav('disc_'+id);
+  document.getElementById('topic-pill').textContent=d.nome;
+  // Resumo
+  document.getElementById('r-title').textContent=d.nome;
+  document.getElementById('r-body').innerHTML=d.resumo+`<div class="concepts-grid">${d.conceitos.map(c=>`<div class="concept-card"><div class="concept-title">${c.t}</div><div class="concept-body">${c.b}</div></div>`).join('')}</div>`;
+  // Mapa
+  document.getElementById('mm-title').textContent=d.nome;
+  // Sincronizar flashcards e progresso do Supabase
+  await syncFlashcardsFromSupabase(id);
+  await syncDisciplinaProgress(id);
+  // Flashcards
+  cur=0;scores=[];renderCard();
+  // Progresso
+  registarDisciplina(d.nome);
+  // Welcome banner
+  const wb=document.getElementById('welcome-banner');
+  document.getElementById('welcome-text').innerHTML=`A estudar <strong>${d.nome}</strong> — ${d.ano}`;
+  wb.style.display='flex';setTimeout(()=>wb.style.display='none',4000);
+  // Mostrar tab resumo
+  showTab('resumo',document.querySelectorAll('.tab-btn')[0]);
+}
+
+function showTab(t,btn){
+  document.querySelectorAll('#view-estudo .view').forEach(el=>el.classList.remove('active'));
+  const el=document.getElementById('tab-'+t);if(el)el.classList.add('active');
+  document.querySelectorAll('.tab-btn').forEach(b=>b.classList.remove('active'));
+  if(btn)btn.classList.add('active');
+}
+
+/* ══ SIDEBAR TOGGLE ══ */
+function toggleSidebar(){document.getElementById('sidebar').classList.toggle('collapsed');}
+function openMobileSidebar(){document.getElementById('sidebar').classList.add('mobile-open');document.getElementById('sidebar-overlay').classList.add('open');}
+function closeMobileSidebar(){document.getElementById('sidebar').classList.remove('mobile-open');document.getElementById('sidebar-overlay').classList.remove('open');}
+function setupResponsive(){const hb=document.getElementById('hamburger-btn');if(hb)hb.style.display=window.innerWidth<641?'flex':'none';}
+window.addEventListener('resize',setupResponsive);
+
+/* ══ AI ══ */
+async function askAI(){
+  const q=document.getElementById('ai-q').value.trim();if(!q)return;
+  const btn=document.getElementById('ai-btn');
+  const resp=document.getElementById('ai-resp');
+  const think=document.getElementById('thinking');
+  btn.disabled=true;resp.classList.remove('show');think.classList.add('show');
+  const context=currentDisciplina?`Estás a ajudar um estudante de medicina sobre "${currentDisciplina.nome}". `:'Estás a ajudar um estudante de medicina. ';
+  try{
+    const res=await fetch('https://api.anthropic.com/v1/messages',{
+      method:'POST',
+      headers:{'Content-Type':'application/json'},
+      body:JSON.stringify({
+        model:'claude-sonnet-4-20250514',max_tokens:600,
+        system:context+'Responde em português europeu, de forma clara e didáctica. Usa linguagem adequada a estudantes de medicina. Máximo 3 parágrafos.',
+        messages:[{role:'user',content:q}]
+      })
+    });
+    const data=await res.json();
+    resp.textContent=data.content?.[0]?.text||'Sem resposta disponível.';
+  }catch{
+    resp.textContent='Sem ligação ao servidor de IA. Verifica a configuração da API.';
+  }
+  think.classList.remove('show');resp.classList.add('show');btn.disabled=false;
+}
+
+/* ══ MINDMAP ══ */
+let mmScale=1,mmX=0,mmY=0,mmDrag=false,mmSX=0,mmSY=0;
+const mmSvg=()=>document.getElementById('mm-svg');
+function applyMM(){if(mmSvg())mmSvg().style.transform=`translate(${mmX}px,${mmY}px) scale(${mmScale})`;}
+function mmZoom(f){mmScale=Math.min(3,Math.max(0.4,mmScale*f));applyMM();}
+function mmReset(){mmScale=1;mmX=0;mmY=0;applyMM();}
+document.addEventListener('DOMContentLoaded',()=>{
+  const w=document.getElementById('mm-wrap');if(!w)return;
+  w.addEventListener('mousedown',e=>{mmDrag=true;mmSX=e.clientX-mmX;mmSY=e.clientY-mmY;});
+  window.addEventListener('mousemove',e=>{if(!mmDrag)return;mmX=e.clientX-mmSX;mmY=e.clientY-mmSY;applyMM();});
+  window.addEventListener('mouseup',()=>mmDrag=false);
+  w.addEventListener('wheel',e=>{e.preventDefault();mmZoom(e.deltaY<0?1.1:0.9);},{passive:false});
+});
+async function mmClick(q){
+  const r=document.getElementById('mm-resp');
+  r.textContent='A pensar...';r.classList.add('show');
+  try{
+    const res=await fetch('https://api.anthropic.com/v1/messages',{
+      method:'POST',headers:{'Content-Type':'application/json'},
+      body:JSON.stringify({model:'claude-sonnet-4-20250514',max_tokens:300,
+        system:'Responde em português europeu em 2-3 frases claras e directas para um estudante de medicina.',
+        messages:[{role:'user',content:q}]})
+    });
+    const d=await res.json();r.textContent=d.content?.[0]?.text||'—';
+  }catch{r.textContent='IA indisponível — verifica a configuração.';}
+}
+
+/* ══ FLASHCARDS ══ */
+function getCards(){
+  if(!currentDisciplina)return[];
+  const saved=S.get('sulcus_cards_'+currentDisciplina.id,null);
+  return saved!==null?saved:currentDisciplina.cards;
+}
+function saveCards(c){if(currentDisciplina)S.set('sulcus_cards_'+currentDisciplina.id,c);}
+
+async function syncFlashcardsFromSupabase(discId){
+  if(!currentSession||!currentSession.uid)return;
+  const {data,error}=await supa.from('flashcards').select('*').eq('user_id',currentSession.uid).eq('disciplina_id',discId);
+  if(!error&&data&&data.length>0){
+    const cards=data.map(r=>({q:r.pergunta,a:r.resposta,_id:r.id}));
+    S.set('sulcus_cards_'+discId,cards);
+  }
+}
+
+async function saveCardToSupabase(q,a,discId){
+  if(!currentSession||!currentSession.uid)return null;
+  const {data,error}=await supa.from('flashcards').insert({user_id:currentSession.uid,disciplina_id:discId,pergunta:q,resposta:a}).select().single();
+  if(error){console.error('Supabase flashcard insert:',error);return null;}
+  return data;
+}
+
+async function deleteCardFromSupabase(cardId){
+  if(!currentSession||!currentSession.uid||!cardId)return;
+  await supa.from('flashcards').delete().eq('id',cardId).eq('user_id',currentSession.uid);
+}
+
+function buildDots(){
+  const wrap=document.getElementById('fc-dots');const cards=getCards();
+  if(!wrap)return;
+  wrap.innerHTML=cards.map((_,i)=>`<div class="fc-dot${i===cur?' active':scores[i]!=null?' done':''}"></div>`).join('');
+}
+function renderCard(){
+  const cards=getCards();
+  if(!cards||cards.length===0){
+    document.getElementById('fc-q').textContent='Sem flashcards para esta disciplina.';
+    document.getElementById('fc-a').textContent='';
+    document.getElementById('fc-ctr').textContent='0 cartões';
+    document.getElementById('fc-front').style.display='';
+    document.getElementById('fc-back').style.display='none';
+    document.getElementById('rating-row').style.display='none';
+    document.getElementById('fc-card').style.cursor='default';
+    document.getElementById('fc-dots').innerHTML='';return;
+  }
+  if(!scores.length||scores.length!==cards.length)scores=new Array(cards.length).fill(null);
+  document.getElementById('fc-q').textContent=cards[cur].q;
+  document.getElementById('fc-a').textContent=cards[cur].a;
+  document.getElementById('fc-ctr').textContent=`${cur+1} / ${cards.length}`;
+  document.getElementById('fc-front').style.display='';
+  document.getElementById('fc-back').style.display='none';
+  document.getElementById('rating-row').style.display='none';
+  document.getElementById('fc-card').style.cursor='pointer';
+  revealed=false;buildDots();
+}
+function revealCard(){
+  if(revealed)return;
+  document.getElementById('fc-front').style.display='none';
+  document.getElementById('fc-back').style.display='';
+  document.getElementById('rating-row').style.display='flex';
+  document.getElementById('fc-card').style.cursor='default';
+  revealed=true;
+}
+function nextCard(r){
+  if(r!==null){
+    scores[cur]=r;
+    const st=getStats();st.fc_revistos=(st.fc_revistos||0)+1;
+    if(r==='easy'||r==='med')st.facil=(st.facil||0)+1;
+    st.total=(st.total||0)+1;saveStats(st);
+    if(currentDisciplina){
+      const dp=S.get('sulcus_dp_'+currentDisciplina.id,{revistos:0,total:0});
+      dp.revistos=(dp.revistos||0)+(r==='easy'||r==='med'?1:0);dp.total=(dp.total||0)+1;
+      saveDisciplinaProgress(currentDisciplina.id,dp);
+    }
+    atualizarStats();
+  }
+  cur=(cur+1)%getCards().length;renderCard();
+}
+function prevCard(){cur=(cur-1+getCards().length)%getCards().length;renderCard();}
+
+/* ══ STATS ══ */
+function getStats(){return S.get('sulcus_stats',{fc_revistos:0,facil:0,total:0,disciplinas:[],dias:[]});}
+function saveStats(st){
+  S.set('sulcus_stats',st);
+  if(currentSession&&currentSession.uid){
+    supa.from('stats').upsert({user_id:currentSession.uid,...st,updated_at:new Date().toISOString()},{onConflict:'user_id'}).then(({error})=>{if(error)console.error('Stats sync:',error);});
+  }
+}
+async function syncStatsFromSupabase(){
+  if(!currentSession||!currentSession.uid)return;
+  const {data,error}=await supa.from('stats').select('*').eq('user_id',currentSession.uid).single();
+  if(!error&&data){
+    const st={fc_revistos:data.fc_revistos||0,facil:data.facil||0,total:data.total||0,disciplinas:data.disciplinas||[],dias:data.dias||[]};
+    S.set('sulcus_stats',st);
+  }
+}
+async function syncDisciplinaProgress(discId){
+  if(!currentSession||!currentSession.uid)return;
+  const {data,error}=await supa.from('disciplina_progress').select('*').eq('user_id',currentSession.uid).eq('disciplina_id',discId).single();
+  if(!error&&data){S.set('sulcus_dp_'+discId,{revistos:data.revistos||0,total:data.total||0});}
+}
+function saveDisciplinaProgress(discId,dp){
+  S.set('sulcus_dp_'+discId,dp);
+  if(currentSession&&currentSession.uid){
+    supa.from('disciplina_progress').upsert({user_id:currentSession.uid,disciplina_id:discId,...dp},{onConflict:'user_id,disciplina_id'}).then(({error})=>{if(error)console.error('DP sync:',error);});
+  }
+}
+function registarDisciplina(nome){const st=getStats();if(!st.disciplinas.includes(nome)){st.disciplinas.push(nome);saveStats(st);}atualizarStats();}
+function atualizarStats(){
+  const st=getStats();const total=st.total||0;const facil=st.facil||0;
+  const pct=total>0?Math.round((facil/total)*100):0;
+  const nd=st.disciplinas.length;const ndias=st.dias.length;
+  ['prog-acerto','pi-acerto'].forEach(id=>{const el=document.getElementById(id);if(el)el.textContent=total>0?pct+'%':'—';});
+  ['prog-fc','pi-fc'].forEach(id=>{const el=document.getElementById(id);if(el)el.textContent=st.fc_revistos||0;});
+  ['prog-disciplinas','pi-disciplinas'].forEach(id=>{const el=document.getElementById(id);if(el)el.textContent=nd;});
+  const piDias=document.getElementById('pi-dias');if(piDias)piDias.textContent=ndias;
+  const totalD=DISCIPLINAS.length;const pctProg=Math.round((nd/totalD)*100);
+  const fill=document.getElementById('prog-fill');const pct2=document.getElementById('prog-pct');
+  if(fill)fill.style.width=pctProg+'%';if(pct2)pct2.textContent=pctProg+'%';
+  const lista=document.getElementById('topic-progress-list');
+  if(lista){
+    if(st.disciplinas.length===0){lista.innerHTML=`<p style="color:var(--hint);font-size:13px;font-family:'Instrument Serif',serif;font-style:italic;">Ainda não estudaste nenhuma disciplina.</p>`;}
+    else{lista.innerHTML=st.disciplinas.map(d=>{
+      const dp=S.get('sulcus_dp_'+d,{revistos:0,total:0});
+      const p=dp.total>0?Math.round((dp.revistos/dp.total)*100):0;
+      const cor=p>=80?'var(--teal)':p>=40?'var(--accent)':'var(--amber)';
+      return `<div class="topic-row"><div class="topic-name">${d}</div><div class="topic-bar"><div class="topic-fill" style="width:${p}%;background:${cor}"></div></div><div class="topic-pct" style="color:${cor}">${p>0?p+'%':'—'}</div></div>`;
+    }).join('');}
+  }
+}
+
+/* ══ ADMIN ══ */
+const ADMIN_EMAIL = 'ivanildomanuel07@gmail.com'; // só este email tem acesso ao admin
+function isAdmin(){return currentSession&&currentSession.email===ADMIN_EMAIL;}
+
+function adminSection(id){
+  document.getElementById('admin-materia').style.display=id==='materia'?'':'none';
+  document.getElementById('admin-flashcards').style.display=id==='flashcards'?'':'none';
+  if(id==='flashcards')renderFcAdminList();
+}
+function renderFcAdminList(){
+  const cards=getCards();const list=document.getElementById('fc-admin-list');if(!list)return;
+  if(cards.length===0){list.innerHTML=`<p style="font-size:12px;color:var(--hint);font-family:'Instrument Serif',serif;font-style:italic;">Sem flashcards para esta disciplina.</p>`;return;}
+  list.innerHTML=cards.map((c,i)=>`<div class="fc-admin-item"><div class="fc-admin-item-content"><div class="fc-admin-q">${c.q}</div><div class="fc-admin-a">${c.a}</div></div><button class="fc-admin-del" onclick="delFlashcard(${i})"><svg width="14" height="14" viewBox="0 0 14 14" fill="none"><path d="M2 4h10M5 4V2.5h4V4M5.5 6.5v4M8.5 6.5v4M3 4l.8 7.5h6.4L11 4" stroke="currentColor" stroke-width="1.2" stroke-linecap="round" stroke-linejoin="round"/></svg></button></div>`).join('');
+}
+async function addFlashcard(){
+  if(!currentDisciplina)return toast('Seleciona uma disciplina primeiro.','');
+  const q=document.getElementById('fc-new-q').value.trim();const a=document.getElementById('fc-new-a').value.trim();
+  if(!q||!a)return toast('Preenche a pergunta e a resposta.','');
+  const cards=getCards();
+  const supaCard=await saveCardToSupabase(q,a,currentDisciplina.id);
+  cards.push({q,a,_id:supaCard?supaCard.id:null});
+  saveCards(cards);scores=new Array(cards.length).fill(null);
+  document.getElementById('fc-new-q').value='';document.getElementById('fc-new-a').value='';
+  renderFcAdminList();
+  const sm=document.getElementById('sm-fc');sm.classList.add('show');setTimeout(()=>sm.classList.remove('show'),2500);
+  renderCard();
+}
+function delFlashcard(i){
+  const cards=getCards();
+  const card=cards[i];
+  if(card&&card._id)deleteCardFromSupabase(card._id);
+  cards.splice(i,1);saveCards(cards);
+  if(cur>=cards.length)cur=Math.max(0,cards.length-1);
+  scores=new Array(cards.length).fill(null);renderFcAdminList();
+  if(cards.length>0)renderCard();toast('Flashcard removido.','');
+}
+function saveMateria(){
+  const nome=document.getElementById('m-nome').value.trim();const resumo=document.getElementById('m-resumo').value.trim();
+  if(!nome||!resumo)return toast('Preenche o nome e o resumo.','');
+  const sm=document.getElementById('sm-materia');sm.classList.add('show');setTimeout(()=>sm.classList.remove('show'),2500);
+  ['m-nome','m-resumo','m-c1','m-c1d','m-c2','m-c2d','m-c3','m-c3d'].forEach(id=>{const el=document.getElementById(id);if(el)el.value='';});
+  toast('Matéria adicionada!','success');
+}
+
+/* ══ TOAST ══ */
+function toast(msg,type=''){
+  const t=document.getElementById('toast');t.textContent=msg;
+  t.className='toast'+(type?' '+type:'')+' show';
+  setTimeout(()=>t.classList.remove('show'),3000);
+}
+
+/* ══ INIT ══ */
+window.addEventListener('DOMContentLoaded',async ()=>{
+  // Detetar tipo de redirect do Supabase
+  const hash=window.location.hash;
+  const params=new URLSearchParams(window.location.search);
+  const hashParams=new URLSearchParams(hash.replace('#',''));
+  const tokenType=hashParams.get('type')||params.get('type');
+
+  // Recuperação de password
+  if(tokenType==='recovery'){
+    history.replaceState(null,'',window.location.pathname);
+    showResetPassword();
+    return;
+  }
+
+  // Confirmação de email (signup ou email_change)
+  if(tokenType==='signup'||tokenType==='email_change'||hash.includes('access_token')){
+    history.replaceState(null,'',window.location.pathname);
+    const {data:{session:supaSession}}=await supa.auth.getSession();
+    if(supaSession){showEmailConfirmed();return;}
+  }
+
+  // Verificar sessão Supabase normal
+  const {data:{session:supaSession}}=await supa.auth.getSession();
+  if(supaSession){
+    const meta=supaSession.user.user_metadata||{};
+    const session={
+      email:supaSession.user.email,
+      nome:meta.nome||'Utilizador',
+      ape:meta.ape||'',
+      curso:meta.curso||'',
+      since:meta.since||'',
+      uid:supaSession.user.id
+    };
+    S.set('sulcus_session',session);
+    const isNew=!S.get('sulcus_onboard_'+session.email);
+    isNew?startOnboarding(session):enterApp(session);
+  } else {
+    S.del('sulcus_session');
+  }
+  // Enter no input AI
+  const aiInput=document.getElementById('ai-q');
+  if(aiInput)aiInput.addEventListener('keydown',e=>{if(e.key==='Enter')askAI();});
+  // Scroll reveal inicial
+  document.querySelectorAll('.reveal').forEach(el=>{
+    if(el.getBoundingClientRect().top<window.innerHeight-40)el.classList.add('visible');
+  });
+  // Mockup AI loop (landing)
+  const aiText=document.getElementById('mock-ai-text-loop');
+  if(aiText){
+    const qs=['Qual a diferença entre IC direita e esquerda?','O que é a classificação NYHA?','Como o SRAA contribui para a IC?','Quais os critérios de Framingham?'];
+    let qi=0;
+    setInterval(()=>{qi=(qi+1)%qs.length;aiText.textContent=qs[qi];},3500);
+  }
+});
+</script>
+
+<!-- Onboarding page (injectado dinamicamente) -->
+<div id="page-onboarding" style="display:none;position:fixed;inset:0;background:var(--bg);z-index:500;align-items:center;justify-content:center;padding:24px;"></div>
+
+</body>
+</html>
